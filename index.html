@@ -5,574 +5,606 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Martin Court HOA - Financial Dashboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #1F4E79 0%, #2E86AB 100%);
-            color: white;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 0;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 0.95rem;
-        }
-
-        .nav-tabs {
-            display: flex;
-            background-color: white;
-            border-bottom: 2px solid #ddd;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .nav-tabs button {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            background: white;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-        }
-
-        .nav-tabs button:hover {
-            background-color: #f0f0f0;
-            color: #333;
-        }
-
-        .nav-tabs button.active {
-            color: #2E86AB;
-            border-bottom-color: #2E86AB;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .kpi-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .kpi-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
-            border-top: 4px solid #2E86AB;
-        }
-
-        .kpi-card h3 {
-            color: #666;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .kpi-card .value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #1F4E79;
-        }
-
-        .kpi-card .subtext {
-            font-size: 0.75rem;
-            color: #999;
-            margin-top: 0.5rem;
-        }
-
-        .charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .chart-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .chart-card h2 {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            color: #1F4E79;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 0.5rem;
-        }
-
-        .chart-container {
-            width: 100%;
-            height: 300px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .metric-box {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-left: 4px solid #2E86AB;
-        }
-
-        .metric-box h3 {
-            color: #1F4E79;
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-        }
-
-        .metric-box .metric-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2E86AB;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        table th {
-            background-color: #f5f5f5;
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-            color: #1F4E79;
-            border-bottom: 2px solid #ddd;
-            font-size: 0.85rem;
-        }
-
-        table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid #eee;
-            font-size: 0.9rem;
-        }
-
-        table tr:hover {
-            background-color: #f9f9f9;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .status-critical {
-            background-color: #fee;
-            color: #c00;
-        }
-
-        .status-urgent {
-            background-color: #ffd;
-            color: #b90;
-        }
-
-        .status-current {
-            background-color: #efe;
-            color: #090;
-        }
-
-        .status-good {
-            background-color: #efe;
-            color: #090;
-        }
-
-        .status-bad {
-            background-color: #fee;
-            color: #c00;
-        }
-
-        .status-on-track {
-            background-color: #eef;
-            color: #00a;
-        }
-
-        .callout {
-            background-color: #eef;
-            border-left: 4px solid #2E86AB;
-            padding: 1.5rem;
-            border-radius: 4px;
-            margin-bottom: 2rem;
-        }
-
-        .callout h3 {
-            color: #1F4E79;
-            margin-bottom: 0.5rem;
-        }
-
-        .callout p {
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            color: #999;
-            font-size: 0.85rem;
-            border-top: 1px solid #ddd;
-            margin-top: 3rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #1F4E79;
-            font-size: 0.9rem;
-        }
-
-        .form-group input[type="number"],
-        .form-group input[type="text"] {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-
-        .form-group input[type="range"] {
-            width: 100%;
-            margin: 0.5rem 0;
-        }
-
-        .slider-value {
-            display: inline-block;
-            background-color: #2E86AB;
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            margin-left: 0.5rem;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .quick-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid #2E86AB;
-            background-color: white;
-            color: #2E86AB;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
-        }
-
-        .quick-btn:hover {
-            background-color: #2E86AB;
-            color: white;
-        }
-
-        .quick-btn.active {
-            background-color: #2E86AB;
-            color: white;
-        }
-
-        .toggle-switch {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.3s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: #2E86AB;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        .results-box {
-            background-color: #f0f8ff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border-left: 4px solid #2E86AB;
-            margin-top: 1.5rem;
-        }
-
-        .results-box h3 {
-            color: #1F4E79;
-            margin-bottom: 1rem;
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #ddd;
-            font-size: 0.95rem;
-        }
-
-        .result-item:last-child {
-            border-bottom: none;
-        }
-
-        .result-item .label {
-            font-weight: 600;
-            color: #666;
-        }
-
-        .result-item .value {
-            color: #2E86AB;
-            font-weight: bold;
-        }
-
-        .pie-charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .pie-chart-container {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .pie-chart-container h3 {
-            color: #1F4E79;
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
-
-        .pie-chart {
-            width: 100%;
-            height: 250px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .forecast-box {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-
-        .forecast-box h3 {
-            color: #1F4E79;
-            margin-bottom: 1.5rem;
-            font-size: 1.1rem;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 0.5rem;
-        }
-
-        .forecast-items {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .forecast-item {
-            padding: 1rem;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .forecast-item h4 {
-            color: #666;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .forecast-item .value {
-            font-size: 1.6rem;
-            font-weight: bold;
-        }
-
-        .forecast-item.positive {
-            background-color: #efe;
-        }
-
-        .forecast-item.positive .value {
-            color: #090;
-        }
-
-        .forecast-item.negative {
-            background-color: #fee;
-        }
-
-        .forecast-item.negative .value {
-            color: #c00;
-        }
-
-        .payment-schedule-wrapper {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-top: 1rem;
-        }
-
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 900px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-            .charts-section {
-                grid-template-columns: 1fr;
-            }
-            .pie-charts-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .highlight-card {
-            background: linear-gradient(135deg, #2E86AB 0%, #1F4E79 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .highlight-card h2 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-            margin-bottom: 0.5rem;
-        }
-
-        .highlight-card .value {
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #1F4E79 0%, #2E86AB 100%); color: white; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 4px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .nav-tabs { position: sticky; top: 0; background: white; border-bottom: 2px solid #e0e0e0; display: flex; overflow-x: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 100; }
+        .nav-tab { flex: 0 0 auto; padding: 16px 20px; background: none; border: none; cursor: pointer; font-size: 14px; font-weight: 500; color: #666; white-space: nowrap; transition: all 0.2s; border-bottom: 3px solid transparent; }
+        .nav-tab:hover { background: #f9f9f9; color: #1F4E79; }
+        .nav-tab.active { color: #1F4E79; border-bottom-color: #1F4E79; font-weight: 600; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .metric-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .metric-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .metric-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; }
+        .metric-value { font-size: 28px; font-weight: 700; color: #1F4E79; margin-bottom: 4px; }
+        .metric-subtext { font-size: 13px; color: #666; }
+        .chart-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); margin-bottom: 24px; }
+        .chart-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px; }
+        .chart-container { width: 100%; height: 350px; }
+        .chart-container-sm { width: 100%; height: 280px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        @media (max-width: 900px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+        .section-title { font-size: 18px; font-weight: 600; color: #333; margin: 24px 0 16px 0; border-bottom: 2px solid #1F4E79; padding-bottom: 10px; }
+        .finding-card { background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-left: 4px solid #FF6B6B; border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+        .finding-card.warning { border-left-color: #FFD93D; }
+        .finding-card.alert { border-left-color: #FF6B6B; }
+        .finding-title { font-weight: 600; font-size: 14px; color: #333; margin-bottom: 6px; }
+        .finding-text { font-size: 13px; color: #666; line-height: 1.5; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        th { background: #1F4E79; color: white; padding: 12px; text-align: left; font-size: 13px; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #e0e0e0; font-size: 13px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #f9f9f9; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+        .badge.critical { background: #FFE5E5; color: #D32F2F; }
+        .badge.urgent { background: #FFF3CD; color: #856404; }
+        .badge.current { background: #D4EDDA; color: #155724; }
+        .status-good { background: #D4EDDA; color: #155724; display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .status-bad { background: #FFE5E5; color: #D32F2F; display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .status-ontrack { background: #D1ECF1; color: #0C5460; display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .fee-callout { background: linear-gradient(135deg, #FFF3CD 0%, #FFFBEA 100%); border-left: 4px solid #FF9800; border-radius: 6px; padding: 16px; margin: 20px 0; font-size: 13px; line-height: 1.6; }
+        .fee-amount { font-weight: 700; color: #D84315; font-size: 16px; }
+        .savings-card { background: white; border-radius: 8px; padding: 20px; border-left: 4px solid #27AE60; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .savings-amount { color: #27AE60; font-size: 24px; font-weight: 700; margin: 8px 0; }
+        .highlight-metric { background: linear-gradient(135deg, #1F4E79 0%, #2E86AB 100%); color: white; border-radius: 8px; padding: 24px; text-align: center; margin-bottom: 24px; }
+        .highlight-metric .big-value { font-size: 42px; font-weight: 700; margin: 8px 0; }
+        .highlight-metric .label { font-size: 16px; opacity: 0.9; }
+        .slider-container { margin: 20px 0; }
+        .slider { width: 100%; height: 6px; border-radius: 3px; background: #ddd; outline: none; -webkit-appearance: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #1F4E79; cursor: pointer; }
+        .slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #1F4E79; cursor: pointer; border: none; }
+        .slider-value { font-size: 18px; font-weight: 700; color: #1F4E79; margin-top: 8px; }
+        .quick-buttons { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .quick-btn { padding: 6px 12px; font-size: 12px; background: #f0f0f0; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+        .quick-btn:hover { background: #e0e0e0; }
+        .quick-btn.active { background: #1F4E79; color: white; border-color: #1F4E79; }
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .comparison-card { background: white; border-radius: 8px; padding: 20px; border-top: 3px solid #1F4E79; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .comparison-label { font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px; }
+        .comparison-value { font-size: 28px; font-weight: 700; color: #1F4E79; }
+        .comparison-sub { font-size: 13px; color: #666; margin-top: 6px; }
+        .forecast-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .forecast-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); text-align: center; }
+        .forecast-card.positive { border-top: 3px solid #27AE60; }
+        .forecast-card.negative { border-top: 3px solid #E74C3C; }
+        .forecast-card.neutral { border-top: 3px solid #2E86AB; }
+        .forecast-card .fc-label { font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px; }
+        .forecast-card .fc-value { font-size: 28px; font-weight: 700; }
+        .forecast-card .fc-sub { font-size: 12px; color: #666; margin-top: 4px; }
+        .data-section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: #333; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: inherit; }
+        input[type="text"]:focus, input[type="number"]:focus { outline: none; border-color: #1F4E79; box-shadow: 0 0 0 3px rgba(31,78,121,0.1); }
+        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .toggle-checkbox { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+        button.primary-btn { background: #1F4E79; color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; }
+        button.primary-btn:hover { background: #2E86AB; }
+        .hidden { display: none !important; }
+        .footer { text-align: center; padding: 24px; font-size: 13px; color: #999; border-top: 1px solid #e0e0e0; margin-top: 40px; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .payment-schedule { max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 6px; }
+        ul { color: #666; font-size: 13px; line-height: 1.8; padding-left: 20px; }
+        ul li { margin-bottom: 6px; }
+        p { font-size: 13px; color: #666; line-height: 1.5; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Martin Court HOA</h1>
-        <p>Financial Dashboard | April 2026</p>
+        <h1>Martin Court HOA - Financial Dashboard</h1>
+        <p>April 2026 | 16 Households</p>
     </div>
 
-    <div id="root"></div>
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('tab1', this)">Financial Health</button>
+        <button class="nav-tab" onclick="switchTab('tab2', this)">Bank Transactions</button>
+        <button class="nav-tab" onclick="switchTab('tab3', this)">Where Your Dues Go</button>
+        <button class="nav-tab" onclick="switchTab('tab4', this)">Q1 2026 Budget Review</button>
+        <button class="nav-tab" onclick="switchTab('tab5', this)">Proposed Solutions</button>
+    </div>
 
+    <div class="container">
+        <!-- ==================== TAB 1: FINANCIAL HEALTH ==================== -->
+        <div id="tab1" class="tab-content active">
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-label">Cash Available</div>
+                    <div class="metric-value">$6,935</div>
+                    <div class="metric-subtext">As of March 31, 2026</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Monthly Spending Gap</div>
+                    <div class="metric-value" style="color:#E74C3C">-$721</div>
+                    <div class="metric-subtext">Avg deficit Q1 2026</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Unpaid Dues</div>
+                    <div class="metric-value">$1,326</div>
+                    <div class="metric-subtext">3 owners behind</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Water Balance Owed</div>
+                    <div class="metric-value" style="color:#E74C3C">$7,486</div>
+                    <div class="metric-subtext">City of Houston</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Income vs Expenses by Month (Q1 2026)</div>
+                <div class="chart-container" id="chart_incomeExpense"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Cash Balance Over Time</div>
+                <div class="chart-container" id="chart_cashTrend"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Year-by-Year Expense Breakdown</div>
+                <div class="grid-4">
+                    <div>
+                        <div style="text-align:center;font-weight:600;margin-bottom:8px;color:#1F4E79;">2023 (Partial Year)</div>
+                        <div style="font-size:12px;text-align:center;color:#666;margin-bottom:4px;">Total: $11,771</div>
+                        <div class="chart-container-sm" id="chart_year2023"></div>
+                    </div>
+                    <div>
+                        <div style="text-align:center;font-weight:600;margin-bottom:8px;color:#1F4E79;">2024</div>
+                        <div style="font-size:12px;text-align:center;color:#666;margin-bottom:4px;">Total: $32,565</div>
+                        <div class="chart-container-sm" id="chart_year2024"></div>
+                    </div>
+                    <div>
+                        <div style="text-align:center;font-weight:600;margin-bottom:8px;color:#1F4E79;">2025</div>
+                        <div style="font-size:12px;text-align:center;color:#666;margin-bottom:4px;">Total: $43,131</div>
+                        <div class="chart-container-sm" id="chart_year2025"></div>
+                    </div>
+                    <div>
+                        <div style="text-align:center;font-weight:600;margin-bottom:8px;color:#1F4E79;">2026 Q1</div>
+                        <div style="font-size:12px;text-align:center;color:#666;margin-bottom:4px;">Total: $9,775</div>
+                        <div class="chart-container-sm" id="chart_year2026"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Key Findings</div>
+
+            <div class="finding-card alert">
+                <div class="finding-title">Water Crisis</div>
+                <div class="finding-text">The community owes the City of Houston $7,486.25 for water charges. Water costs accounted for 53% of all spending in 2025. This is the #1 driver of our financial deficit.</div>
+            </div>
+            <div class="finding-card alert">
+                <div class="finding-title">Structural Monthly Deficit</div>
+                <div class="finding-text">Current monthly expenses (~$2,925) exceed dues income ($2,688) by ~$237/month. Without additional revenue or cost reductions, reserves will continue declining.</div>
+            </div>
+            <div class="finding-card warning">
+                <div class="finding-title">Low Cash Reserves</div>
+                <div class="finding-text">Only $6,935 in available cash. Industry standard is 6-12 months of operating expenses ($17,550-$35,100). We are well below recommended levels.</div>
+            </div>
+            <div class="finding-card warning">
+                <div class="finding-title">Excessive Processing Fees</div>
+                <div class="finding-text">Annual fee burden of $2,555 ($13.30 per household/month) includes Intuit processing ($1,759) and Stellar Bank charges ($796). That is 7.9% of dues income going to fees.</div>
+            </div>
+
+            <div class="section-title">Collections Status</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Owner</th>
+                        <th>Current</th>
+                        <th>1-30 Days</th>
+                        <th>31-60 Days</th>
+                        <th>61-90 Days</th>
+                        <th>&gt;90 Days</th>
+                        <th>Total Owed</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Owner A</strong></td>
+                        <td>$168</td><td>$168</td><td>$168</td><td>$168</td><td>$0</td>
+                        <td><strong>$672</strong></td>
+                        <td><span class="badge critical">CRITICAL</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Owner B</strong></td>
+                        <td>$168</td><td>$168</td><td>$168</td><td>$0</td><td>$0</td>
+                        <td><strong>$504</strong></td>
+                        <td><span class="badge urgent">URGENT</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Owner C</strong></td>
+                        <td>$168</td><td>$0</td><td>$0</td><td>$0</td><td>$0</td>
+                        <td><strong>$168</strong></td>
+                        <td><span class="badge current">CURRENT</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ==================== TAB 2: BANK TRANSACTIONS ==================== -->
+        <div id="tab2" class="tab-content">
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-label">Total Deposits</div>
+                    <div class="metric-value" style="color:#27AE60">$85,894</div>
+                    <div class="metric-subtext">Mar 2023 - Apr 2026</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Withdrawals</div>
+                    <div class="metric-value" style="color:#E74C3C">$78,887</div>
+                    <div class="metric-subtext">Mar 2023 - Apr 2026</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Number of Transactions</div>
+                    <div class="metric-value">575</div>
+                    <div class="metric-subtext">All account activity</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Intuit Fees Paid</div>
+                    <div class="metric-value" style="color:#E74C3C">$1,759</div>
+                    <div class="metric-subtext">169 transactions @ $10.41 avg</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Monthly Cash Flow (Mar 2023 - Apr 2026)</div>
+                <div class="chart-container" id="chart_cashFlow"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Total Spending by Vendor</div>
+                <div class="chart-container" id="chart_vendor"></div>
+            </div>
+
+            <div class="fee-callout">
+                <div style="font-weight:600;margin-bottom:8px;">Fee Analysis</div>
+                <div>Intuit processing fees: <span class="fee-amount">$1,759/year</span> (169 transactions = $10.41 average per batch)</div>
+                <div style="margin-top:6px;">Stellar Bank account analysis charges: <span class="fee-amount">$796/year</span> ($25.75/month)</div>
+                <div style="margin-top:12px;padding-top:12px;border-top:1px solid #FFB84D;font-weight:600;">Total annual fee burden: <span class="fee-amount">$2,555</span> = <span class="fee-amount">$13.30/month per household</span></div>
+                <div style="margin-top:6px;font-weight:600;">That is 7.9% of every dues payment going to bank and processing fees.</div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: WHERE YOUR DUES GO ==================== -->
+        <div id="tab3" class="tab-content">
+            <div class="highlight-metric">
+                <div class="label">Total Monthly Income per Household</div>
+                <div class="big-value">$168</div>
+                <div class="label">16 households &times; $168 = $2,688/month total</div>
+            </div>
+
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-label">Total Monthly Cost</div>
+                    <div class="metric-value">$225</div>
+                    <div class="metric-subtext">Current expenses per household</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Monthly Shortfall</div>
+                    <div class="metric-value" style="color:#E74C3C">-$57</div>
+                    <div class="metric-subtext">Gap per household</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Highest Expense</div>
+                    <div class="metric-value">$93.13</div>
+                    <div class="metric-subtext">Water per household</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Fee Percentage</div>
+                    <div class="metric-value">7.9%</div>
+                    <div class="metric-subtext">Bank fees of dues</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="chart-card">
+                    <div class="chart-title">Per-Household Spending by Category</div>
+                    <div class="chart-container" id="chart_duesBar"></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Expense Distribution (%)</div>
+                    <div class="chart-container" id="chart_duesPie"></div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Per-Household Monthly Breakdown</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Monthly Total</th>
+                            <th>Per Household</th>
+                            <th>% of Dues</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Water (Current)</td><td>$1,490</td><td>$93.13</td><td>55.4%</td></tr>
+                        <tr><td>Property Management</td><td>$525</td><td>$32.81</td><td>19.5%</td></tr>
+                        <tr><td>Trash</td><td>$487</td><td>$30.44</td><td>18.1%</td></tr>
+                        <tr><td>Landscaping</td><td>$401</td><td>$25.06</td><td>14.9%</td></tr>
+                        <tr><td>Bank/Processing Fees</td><td>$93</td><td>$5.81</td><td>3.5%</td></tr>
+                        <tr><td>Insurance</td><td>$69</td><td>$4.31</td><td>2.6%</td></tr>
+                        <tr><td>Repairs</td><td>$83</td><td>$5.19</td><td>3.1%</td></tr>
+                        <tr><td>Professional Fees</td><td>$24</td><td>$1.50</td><td>0.9%</td></tr>
+                        <tr><td>Electric</td><td>$13</td><td>$0.81</td><td>0.5%</td></tr>
+                        <tr><td>Taxes</td><td>$2</td><td>$0.13</td><td>0.1%</td></tr>
+                        <tr style="font-weight:700;background:#f0f0f0;">
+                            <td>TOTAL</td><td>$3,187</td><td>$199.19</td><td>119%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="fee-callout">
+                <div style="font-weight:600;margin-bottom:8px;">Why is our total cost more than dues?</div>
+                <div>Each household pays $168/month, but actual costs are ~$199/household. The $31 monthly gap per household ($496/month total) is covered by reserves. This is why cash reserves are declining and is not sustainable long-term. The water debt ($7,486) adds additional pressure.</div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 4: Q1 2026 BUDGET REVIEW ==================== -->
+        <div id="tab4" class="tab-content">
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-label">Total Q1 Income</div>
+                    <div class="metric-value" style="color:#27AE60">$7,560</div>
+                    <div class="metric-subtext">Dues collected</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Q1 Expenses</div>
+                    <div class="metric-value" style="color:#E74C3C">$9,589</div>
+                    <div class="metric-subtext">All categories</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Q1 Variance</div>
+                    <div class="metric-value" style="color:#E74C3C">-$2,029</div>
+                    <div class="metric-subtext">Expenses over income</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Budget vs Actual</div>
+                    <div class="metric-value" style="color:#E74C3C">-26.7%</div>
+                    <div class="metric-subtext">Total variance</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Q1 Budget vs Actual by Category</div>
+                <div class="chart-container" id="chart_budget"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Category Analysis</div>
+                <table>
+                    <thead>
+                        <tr><th>Category</th><th>Q1 Budget</th><th>Q1 Actual</th><th>Variance</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>HOA Dues (Income)</td><td>$8,064</td><td>$7,560</td><td>-$504</td><td><span class="status-bad">Under Target</span></td></tr>
+                        <tr><td>Property Management</td><td>$1,575</td><td>$1,575</td><td>$0</td><td><span class="status-ontrack">On Track</span></td></tr>
+                        <tr><td>Water</td><td>$5,959</td><td>$4,193</td><td>-$1,766</td><td><span class="status-good">Under Budget</span></td></tr>
+                        <tr><td>Trash</td><td>$1,349</td><td>$974</td><td>-$375</td><td><span class="status-good">Under Budget</span></td></tr>
+                        <tr><td>Landscaping</td><td>$1,166</td><td>$1,429</td><td>+$263</td><td><span class="status-bad">Over Budget</span></td></tr>
+                        <tr><td>Insurance</td><td>$515</td><td>$623</td><td>+$108</td><td><span class="status-bad">Over Budget</span></td></tr>
+                        <tr><td>Bank Fees</td><td>$280</td><td>$257</td><td>-$23</td><td><span class="status-good">Under Budget</span></td></tr>
+                        <tr><td>Professional Fees</td><td>$71</td><td>$200</td><td>+$129</td><td><span class="status-bad">Over Budget</span></td></tr>
+                        <tr><td>Electric</td><td>$39</td><td>$38</td><td>-$1</td><td><span class="status-good">Under Budget</span></td></tr>
+                        <tr><td>Repairs</td><td>$250</td><td>$0</td><td>-$250</td><td><span class="status-good">Under Budget</span></td></tr>
+                        <tr><td>Taxes</td><td>$4</td><td>$0</td><td>-$4</td><td><span class="status-good">Under Budget</span></td></tr>
+                        <tr><td>Violations</td><td>$0</td><td>$486</td><td>+$486</td><td><span class="status-bad">Over Budget</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart-card" style="margin-top:24px;">
+                <div class="chart-title">Notes on Variance</div>
+                <ul>
+                    <li><strong>Dues Under Target:</strong> 3 owners behind on payments explains $504 shortfall in collections.</li>
+                    <li><strong>Water Under Budget:</strong> Actual consumption lower than projected ($4,193 vs $5,959). Positive, but may reflect delayed billing.</li>
+                    <li><strong>Landscaping Over:</strong> One-time spring maintenance boosted costs by $263.</li>
+                    <li><strong>Professional Fees:</strong> Bookkeeping costs higher than annual average due to compliance review.</li>
+                    <li><strong>Violations:</strong> Unexpected $486 in violation enforcement fees for community safety.</li>
+                    <li><strong>Trash Savings:</strong> Possible billing adjustment or usage reduction saved $375.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 5: PROPOSED SOLUTIONS ==================== -->
+        <div id="tab5" class="tab-content">
+            <div class="section-title">What-If Scenario Planner</div>
+
+            <div class="data-section">
+                <div class="form-group">
+                    <div class="form-label">Monthly Dues per Household</div>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="duesSlider" min="150" max="260" value="168" oninput="updateScenario()">
+                        <div class="slider-value">$<span id="duesValue">168</span>/month</div>
+                        <div class="quick-buttons" id="duesButtons">
+                            <button class="quick-btn" onclick="setDues(150)">$150</button>
+                            <button class="quick-btn active" onclick="setDues(168)">$168 (Current)</button>
+                            <button class="quick-btn" onclick="setDues(200)">$200</button>
+                            <button class="quick-btn" onclick="setDues(225)">$225</button>
+                            <button class="quick-btn" onclick="setDues(260)">$260</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toggle-checkbox">
+                    <input type="checkbox" id="assessmentToggle" onchange="updateScenario()">
+                    <label for="assessmentToggle" style="cursor:pointer;font-weight:500;">Include one-time water payoff special assessment ($468/household)</label>
+                </div>
+
+                <div id="assessmentInfo" class="metric-card hidden" style="background:#E8F5E9;border-left:4px solid #27AE60;">
+                    <div class="metric-label">Special Assessment</div>
+                    <div class="metric-value">$468</div>
+                    <div class="metric-subtext">One-time per household to clear $7,486 water balance ($7,486 / 16 = $468)</div>
+                </div>
+
+                <div class="input-grid">
+                    <div class="form-group">
+                        <label class="form-label">Water ($/mo)</label>
+                        <input type="number" id="sc_water" value="1490" oninput="updateScenario()" style="text-align:right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Property Mgmt ($/mo)</label>
+                        <input type="number" id="sc_propmgmt" value="525" oninput="updateScenario()" style="text-align:right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Trash ($/mo)</label>
+                        <input type="number" id="sc_trash" value="487" oninput="updateScenario()" style="text-align:right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Landscaping ($/mo)</label>
+                        <input type="number" id="sc_landscape" value="401" oninput="updateScenario()" style="text-align:right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bank Fees ($/mo)</label>
+                        <input type="number" id="sc_fees" value="93" oninput="updateScenario()" style="text-align:right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Other ($/mo)</label>
+                        <input type="number" id="sc_other" value="189" oninput="updateScenario()" style="text-align:right;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="comparison-label">Annual Dues Income</div>
+                    <div class="comparison-value" id="sc_income">$32,256</div>
+                </div>
+                <div class="comparison-card">
+                    <div class="comparison-label">Annual Expenses</div>
+                    <div class="comparison-value" id="sc_expenses">$38,220</div>
+                </div>
+                <div class="comparison-card">
+                    <div class="comparison-label">Annual Net</div>
+                    <div class="comparison-value" id="sc_net" style="color:#E74C3C">-$5,964</div>
+                </div>
+            </div>
+
+            <div class="section-title">12-Month Forecast</div>
+            <div class="forecast-grid">
+                <div class="forecast-card negative" id="fc_monthly">
+                    <div class="fc-label">Monthly Net</div>
+                    <div class="fc-value" style="color:#E74C3C" id="fc_monthly_val">-$497</div>
+                    <div class="fc-sub">Income minus expenses per month</div>
+                </div>
+                <div class="forecast-card negative" id="fc_projected">
+                    <div class="fc-label">12-Month Cash Projection</div>
+                    <div class="fc-value" style="color:#E74C3C" id="fc_projected_val">$971</div>
+                    <div class="fc-sub" id="fc_projected_sub">Starting from $6,935 current cash</div>
+                </div>
+                <div class="forecast-card neutral" id="fc_breakeven">
+                    <div class="fc-label">Break-even Dues</div>
+                    <div class="fc-value" style="color:#2E86AB" id="fc_breakeven_val">$199</div>
+                    <div class="fc-sub">Minimum dues to cover expenses</div>
+                </div>
+            </div>
+
+            <div class="section-title">Cost Savings Opportunities</div>
+
+            <div class="savings-card">
+                <div class="finding-title">1. Reduce Intuit Processing Fees</div>
+                <div style="font-size:13px;color:#666;margin:8px 0;">Current annual cost: <strong style="color:#1F4E79">$1,759</strong> (169 transactions)</div>
+                <div class="savings-amount">Save $780/year ($65/month)</div>
+                <div style="font-size:13px;color:#666;">Set up ACH direct debit through Stellar Bank to collect dues directly. Eliminates individual Intuit charges while reducing payment friction.</div>
+            </div>
+
+            <div class="savings-card">
+                <div class="finding-title">2. Negotiate Stellar Bank Account Fees</div>
+                <div style="font-size:13px;color:#666;margin:8px 0;">Current annual cost: <strong style="color:#1F4E79">$796</strong> ($25.75/month)</div>
+                <div class="savings-amount">Save $400-796/year ($33-66/month)</div>
+                <div style="font-size:13px;color:#666;">Many banks offer free or low-cost HOA accounts. Get quotes from Credit Union or online banks. Even negotiating with Stellar could cut charges 50%.</div>
+            </div>
+
+            <div class="savings-card">
+                <div class="finding-title">3. Review Landscaping Contract (Saint Clair &amp; Sons)</div>
+                <div style="font-size:13px;color:#666;margin:8px 0;">Current annual cost: <strong style="color:#1F4E79">$4,806</strong> ($401/month)</div>
+                <div class="savings-amount">Save $500-1,000/year ($42-83/month)</div>
+                <div style="font-size:13px;color:#666;">Industry benchmark for 16-unit HOA is $300-450/month. Request competitive bids from 2-3 vendors. Consider reducing frequency.</div>
+            </div>
+
+            <div class="savings-card">
+                <div class="finding-title">4. Renegotiate Trash Service (Texas Pride)</div>
+                <div style="font-size:13px;color:#666;margin:8px 0;">Current annual cost: <strong style="color:#1F4E79">$5,843</strong> ($487/month)</div>
+                <div class="savings-amount">Save $400-800/year ($33-67/month)</div>
+                <div style="font-size:13px;color:#666;">Get competitive quotes from Republic Services and Waste Management. Volume discounts may be available.</div>
+            </div>
+
+            <div class="section-title">Water Debt Payoff Plan</div>
+
+            <div class="data-section">
+                <div class="grid-2">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Water Balance Owed</label>
+                            <input type="number" id="waterBalance" value="7486.25" oninput="updateWaterPlan()" style="text-align:right;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payoff Period (Months)</label>
+                            <input type="number" id="waterMonths" value="18" min="1" max="60" oninput="updateWaterPlan()" style="text-align:right;width:120px;">
+                            <div class="quick-buttons" id="waterButtons" style="margin-top:8px;">
+                                <button class="quick-btn" onclick="setWaterMonths(6)">6 mo</button>
+                                <button class="quick-btn active" onclick="setWaterMonths(18)">18 mo</button>
+                                <button class="quick-btn" onclick="setWaterMonths(24)">24 mo</button>
+                                <button class="quick-btn" onclick="setWaterMonths(36)">36 mo</button>
+                            </div>
+                        </div>
+                        <div class="toggle-checkbox">
+                            <input type="checkbox" id="waterOneTimeToggle" onchange="updateWaterPlan()">
+                            <label for="waterOneTimeToggle" style="cursor:pointer;font-weight:500;">One-time assessment instead</label>
+                        </div>
+                        <div id="waterOneTimeInfo" class="hidden" style="background:#E8F5E9;padding:12px;border-radius:6px;margin-top:8px;">
+                            <strong>$468.14 per household</strong> clears the entire balance immediately.
+                        </div>
+                    </div>
+                    <div>
+                        <div class="metric-cards" style="margin-bottom:0;">
+                            <div class="metric-card">
+                                <div class="metric-label">Monthly Payment</div>
+                                <div class="metric-value" id="wp_monthly">$416</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Per Household</div>
+                                <div class="metric-value" id="wp_perHH">$26</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Payoff Date</div>
+                                <div class="metric-value" id="wp_date" style="font-size:22px;">Oct 2027</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Payment Schedule</div>
+                <div class="payment-schedule">
+                    <table id="waterScheduleTable">
+                        <thead>
+                            <tr><th>Month</th><th>Payment</th><th>Remaining Balance</th></tr>
+                        </thead>
+                        <tbody id="waterScheduleBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="chart-card" style="border-left:4px solid #27AE60;">
+                <div class="chart-title">Post-Payoff Benefit</div>
+                <p>Once water balance is cleared, the community can redirect that monthly payment to reserves, infrastructure improvements, or reducing dues. Addressing the water debt urgently is critical because it frees up cash flow for other priorities.</p>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">Last Updated: April 7, 2026</div>
+    </div>
+
+    <!-- SCRIPTS -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/prop-types@15/prop-types.min.js"></script>
@@ -581,1118 +613,407 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-        const {BarChart, Bar, LineChart, Line, PieChart, Pie, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell} = Recharts;
+        var RC = Recharts;
+        var BarChart = RC.BarChart;
+        var Bar = RC.Bar;
+        var LineChart = RC.LineChart;
+        var Line = RC.Line;
+        var AreaChart = RC.AreaChart;
+        var Area = RC.Area;
+        var PieChart = RC.PieChart;
+        var Pie = RC.Pie;
+        var Cell = RC.Cell;
+        var XAxis = RC.XAxis;
+        var YAxis = RC.YAxis;
+        var CartesianGrid = RC.CartesianGrid;
+        var Tooltip = RC.Tooltip;
+        var Legend = RC.Legend;
+        var ResponsiveContainer = RC.ResponsiveContainer;
+        var ComposedChart = RC.ComposedChart;
 
-        const monthlyData = [
-            {month: 'Jan 2026', income: 2352, expenses: 1642},
-            {month: 'Feb 2026', income: 2688, expenses: 3005},
-            {month: 'Mar 2026', income: 2520, expenses: 5128}
+        var COLORS = ['#2E86AB','#A23B72','#F18F01','#C73E1D','#6A994E','#BC4749','#2A9D8F','#E76F51','#D4A574','#9D4EDD','#3A86FF'];
+
+        // ===== TAB 1 CHARTS =====
+
+        // Income vs Expenses
+        var incomeExpenseData = [
+            {month:'Jan 2026',income:2352,expenses:1642},
+            {month:'Feb 2026',income:2688,expenses:3005},
+            {month:'Mar 2026',income:2520,expenses:5128}
         ];
 
-        const cashBalanceData = [
-            {period: 'Dec 2023', balance: 8182},
-            {period: 'Dec 2024', balance: 18513},
-            {period: 'Dec 2025', balance: 9151},
-            {period: 'Mar 2026', balance: 6935}
+        function renderLabel(props) {
+            var x = props.x; var y = props.y; var w = props.width; var val = props.value;
+            return React.createElement('text', {x: x + w/2, y: y - 5, textAnchor:'middle', fill:'#333', fontSize:11, fontWeight:600}, '$' + val.toLocaleString());
+        }
+
+        ReactDOM.render(
+            React.createElement(ResponsiveContainer, {width:'100%',height:340},
+                React.createElement(BarChart, {data:incomeExpenseData, margin:{top:25,right:20,bottom:5,left:20}},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {dataKey:'month'}),
+                    React.createElement(YAxis, {tickFormatter: function(v){return '$'+v.toLocaleString();}}),
+                    React.createElement(Tooltip, {formatter: function(v){return '$'+v.toLocaleString();}}),
+                    React.createElement(Legend, null),
+                    React.createElement(Bar, {dataKey:'income',fill:'#27AE60',name:'Income',label:renderLabel}),
+                    React.createElement(Bar, {dataKey:'expenses',fill:'#E74C3C',name:'Expenses',label:renderLabel})
+                )
+            ),
+            document.getElementById('chart_incomeExpense')
+        );
+
+        // Cash Balance
+        var cashTrendData = [
+            {period:'Dec 2023',cash:8182},
+            {period:'Dec 2024',cash:18513},
+            {period:'Dec 2025',cash:9151},
+            {period:'Mar 2026',cash:6935}
         ];
 
-        const expensesByYear = {
-            2023: [
-                {name: 'Water', value: 4193},
-                {name: 'Property Mgmt', value: 2625},
-                {name: 'Landscaping', value: 1950},
-                {name: 'Trash', value: 1461},
-                {name: 'Insurance', value: 824},
-                {name: 'Bank Fees', value: 396},
-                {name: 'Other', value: 322}
-            ],
-            2024: [
-                {name: 'Water', value: 12807},
-                {name: 'Property Mgmt', value: 6300},
-                {name: 'Trash', value: 5397},
-                {name: 'Landscaping', value: 4662},
-                {name: 'Insurance', value: 824},
-                {name: 'Bank Fees', value: 1119},
-                {name: 'Repairs', value: 1000},
-                {name: 'Professional', value: 285},
-                {name: 'Electric', value: 156},
-                {name: 'Taxes', value: 15}
-            ],
-            2025: [
-                {name: 'Water', value: 22931},
-                {name: 'Property Mgmt', value: 6300},
-                {name: 'Trash', value: 5789},
-                {name: 'Landscaping', value: 5207},
-                {name: 'Bank Fees', value: 1132},
-                {name: 'Insurance', value: 824},
-                {name: 'Other', value: 948}
-            ],
-            2026: [
-                {name: 'Water', value: 4193},
-                {name: 'Property Mgmt', value: 1575},
-                {name: 'Landscaping', value: 1429},
-                {name: 'Trash', value: 974},
-                {name: 'Insurance', value: 623},
-                {name: 'Violations', value: 486},
-                {name: 'Bank Fees', value: 257},
-                {name: 'Professional', value: 200},
-                {name: 'Electric', value: 38}
-            ]
+        function renderLineLabel(props) {
+            var x = props.x; var y = props.y; var val = props.value;
+            return React.createElement('text', {x:x, y:y-10, textAnchor:'middle', fill:'#1F4E79', fontSize:12, fontWeight:700}, '$' + val.toLocaleString());
+        }
+
+        ReactDOM.render(
+            React.createElement(ResponsiveContainer, {width:'100%',height:340},
+                React.createElement(AreaChart, {data:cashTrendData, margin:{top:25,right:20,bottom:5,left:20}},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {dataKey:'period'}),
+                    React.createElement(YAxis, {tickFormatter: function(v){return '$'+v.toLocaleString();}}),
+                    React.createElement(Tooltip, {formatter: function(v){return '$'+v.toLocaleString();}}),
+                    React.createElement(Area, {type:'monotone',dataKey:'cash',fill:'rgba(31,78,121,0.15)',stroke:'#1F4E79',strokeWidth:2,label:renderLineLabel})
+                )
+            ),
+            document.getElementById('chart_cashTrend')
+        );
+
+        // Year-by-Year Expense Breakdowns (horizontal bar charts instead of pies)
+        var years = {
+            2023: {data:[{name:'Water',value:4193},{name:'Prop Mgmt',value:2625},{name:'Landscaping',value:1950},{name:'Trash',value:1461},{name:'Insurance',value:824},{name:'Bank Fees',value:396},{name:'Other',value:322}], total:11771},
+            2024: {data:[{name:'Water',value:12807},{name:'Prop Mgmt',value:6300},{name:'Trash',value:5397},{name:'Landscaping',value:4662},{name:'Bank Fees',value:1119},{name:'Repairs',value:1000},{name:'Insurance',value:824},{name:'Professional',value:285},{name:'Electric',value:156},{name:'Taxes',value:15}], total:32565},
+            2025: {data:[{name:'Water',value:22931},{name:'Prop Mgmt',value:6300},{name:'Trash',value:5789},{name:'Landscaping',value:5207},{name:'Bank Fees',value:1132},{name:'Insurance',value:824},{name:'Other',value:948}], total:43131},
+            2026: {data:[{name:'Water',value:4193},{name:'Prop Mgmt',value:1575},{name:'Landscaping',value:1429},{name:'Trash',value:974},{name:'Insurance',value:623},{name:'Violations',value:486},{name:'Bank Fees',value:257},{name:'Professional',value:200},{name:'Electric',value:38}], total:9775}
         };
 
-        const expenseTotals = {
-            2023: 11771,
-            2024: 32565,
-            2025: 43131,
-            2026: 9775
-        };
-
-        const colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#6A994E', '#BC4749', '#2A9D8F', '#E76F51'];
-
-        const monthlyFlowData = [
-            {month:'Mar 23',deposits:840,withdrawals:0},
-            {month:'Apr 23',deposits:336,withdrawals:346},
-            {month:'May 23',deposits:704,withdrawals:714},
-            {month:'Jun 23',deposits:1240,withdrawals:0},
-            {month:'Jul 23',deposits:536,withdrawals:165},
-            {month:'Aug 23',deposits:2868,withdrawals:329},
-            {month:'Sep 23',deposits:872,withdrawals:761},
-            {month:'Oct 23',deposits:1208,withdrawals:317},
-            {month:'Nov 23',deposits:1544,withdrawals:253},
-            {month:'Dec 23',deposits:1376,withdrawals:247},
-            {month:'Jan 24',deposits:1344,withdrawals:456},
-            {month:'Feb 24',deposits:1712,withdrawals:1440},
-            {month:'Mar 24',deposits:3224,withdrawals:1649},
-            {month:'Apr 24',deposits:2384,withdrawals:2677},
-            {month:'May 24',deposits:1680,withdrawals:1907},
-            {month:'Jun 24',deposits:4936,withdrawals:1477},
-            {month:'Jul 24',deposits:1680,withdrawals:1685},
-            {month:'Aug 24',deposits:2016,withdrawals:1931},
-            {month:'Sep 24',deposits:3056,withdrawals:2012},
-            {month:'Oct 24',deposits:3528,withdrawals:1485},
-            {month:'Nov 24',deposits:1848,withdrawals:1541},
-            {month:'Dec 24',deposits:2921,withdrawals:1949},
-            {month:'Jan 25',deposits:2016,withdrawals:605},
-            {month:'Feb 25',deposits:3864,withdrawals:2334},
-            {month:'Mar 25',deposits:1848,withdrawals:4969},
-            {month:'Apr 25',deposits:2520,withdrawals:7412},
-            {month:'May 25',deposits:4730,withdrawals:8478},
-            {month:'Jun 25',deposits:2520,withdrawals:1511},
-            {month:'Jul 25',deposits:2352,withdrawals:2130},
-            {month:'Aug 25',deposits:2856,withdrawals:4736},
-            {month:'Sep 25',deposits:3528,withdrawals:1542},
-            {month:'Oct 25',deposits:2856,withdrawals:5432},
-            {month:'Nov 25',deposits:2184,withdrawals:3135},
-            {month:'Dec 25',deposits:3696,withdrawals:2049},
-            {month:'Jan 26',deposits:2352,withdrawals:1642},
-            {month:'Feb 26',deposits:2520,withdrawals:2999},
-            {month:'Mar 26',deposits:2688,withdrawals:5134},
-            {month:'Apr 26',deposits:1512,withdrawals:1440}
-        ];
-
-        const vendorData = [
-            {vendor: 'City of Houston (Water)', amount: 27124},
-            {vendor: 'LLA Property Partners', amount: 16321},
-            {vendor: 'Saint Clair & Sons', amount: 14168},
-            {vendor: 'Texas Pride', amount: 12853},
-            {vendor: 'Stellar Bank', amount: 1856},
-            {vendor: 'Intuit/QuickBooks', amount: 1759},
-            {vendor: 'US Liability Ins', amount: 1448},
-            {vendor: 'Anne Beauregard', amount: 1013},
-            {vendor: 'Various Repairs', amount: 2130},
-            {vendor: 'NRG/Reliant', amount: 189},
-            {vendor: 'Harris County', amount: 26}
-        ];
-
-        const duesBreakdown = [
-            {category: 'Water', amount: 93.13},
-            {category: 'Property Mgmt', amount: 32.81},
-            {category: 'Trash', amount: 30.44},
-            {category: 'Landscaping', amount: 25.06},
-            {category: 'Fees', amount: 5.81},
-            {category: 'Insurance', amount: 4.31},
-            {category: 'Repairs', amount: 5.19},
-            {category: 'Other', amount: 2.44}
-        ];
-
-        const budgetData = [
-            {category: 'HOA Dues', budget: 8064, actual: 7560},
-            {category: 'Property Mgmt', budget: 1575, actual: 1575},
-            {category: 'Water', budget: 5959, actual: 4193},
-            {category: 'Trash', budget: 1349, actual: 974},
-            {category: 'Landscaping', budget: 1166, actual: 1429},
-            {category: 'Insurance', budget: 515, actual: 623},
-            {category: 'Bank Fees', budget: 280, actual: 257},
-            {category: 'Professional Fees', budget: 71, actual: 200},
-            {category: 'Electric', budget: 39, actual: 38},
-            {category: 'Repairs', budget: 250, actual: 0},
-            {category: 'Taxes', budget: 4, actual: 0},
-            {category: 'Violations', budget: 0, actual: 486}
-        ];
-
-        const COLORS_VENDORS = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#6A994E', '#BC4749', '#2A9D8F', '#E76F51', '#D4A574', '#9D4EDD', '#3A86FF'];
-
-        function formatCurrency(value) {
-            return '$' + value.toLocaleString();
-        }
-
-        function Tab1FinancialHealth() {
-            return React.createElement('div', {className: 'tab-content active'},
-                React.createElement('div', {className: 'kpi-cards'},
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Cash Available'),
-                        React.createElement('div', {className: 'value'}, '$6,935'),
-                        React.createElement('div', {className: 'subtext'}, 'As of March 31, 2026')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Monthly Spending Gap'),
-                        React.createElement('div', {className: 'value'}, '-$721'),
-                        React.createElement('div', {className: 'subtext'}, 'Avg deficit Q1 2026')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Unpaid Dues'),
-                        React.createElement('div', {className: 'value'}, '$1,326'),
-                        React.createElement('div', {className: 'subtext'}, '3 owners behind')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Water Balance Owed'),
-                        React.createElement('div', {className: 'value'}, '$7,486'),
-                        React.createElement('div', {className: 'subtext'}, 'City of Houston')
-                    )
-                ),
-                React.createElement('div', {className: 'charts-section'},
-                    React.createElement('div', {className: 'chart-card'},
-                        React.createElement('h2', null, 'Income vs Expenses'),
-                        React.createElement('div', {id: 'incomeExpenses'})
-                    ),
-                    React.createElement('div', {className: 'chart-card'},
-                        React.createElement('h2', null, 'Cash Balance Over Time'),
-                        React.createElement('div', {id: 'cashBalance'})
-                    )
-                ),
-                React.createElement('div', {className: 'chart-card full-width'},
-                    React.createElement('h2', null, 'Year-by-Year Expense Breakdown'),
-                    React.createElement('div', {className: 'pie-charts-grid'},
-                        React.createElement('div', {className: 'pie-chart-container'},
-                            React.createElement('h3', null, '2023'),
-                            React.createElement('div', {id: 'pie2023'})
-                        ),
-                        React.createElement('div', {className: 'pie-chart-container'},
-                            React.createElement('h3', null, '2024'),
-                            React.createElement('div', {id: 'pie2024'})
-                        ),
-                        React.createElement('div', {className: 'pie-chart-container'},
-                            React.createElement('h3', null, '2025'),
-                            React.createElement('div', {id: 'pie2025'})
-                        ),
-                        React.createElement('div', {className: 'pie-chart-container'},
-                            React.createElement('h3', null, '2026 Q1'),
-                            React.createElement('div', {id: 'pie2026'})
-                        )
-                    )
-                ),
-                React.createElement('div', {className: 'metric-box full-width'},
-                    React.createElement('h3', null, 'Key Findings'),
-                    React.createElement('div', null,
-                        React.createElement('p', {style: {marginBottom: '0.5rem'}}, '• Water costs continue to be the dominant expense at ~$93/household/month'),
-                        React.createElement('p', {style: {marginBottom: '0.5rem'}}, '• Q1 deficit of $2,029 shows accelerating cash burn'),
-                        React.createElement('p', {style: {marginBottom: '0.5rem'}}, '• Current dues ($168/month) insufficient to cover expenses (~$225/month)'),
-                        React.createElement('p', {style: {marginBottom: '0.5rem'}}, '• $7,486 water debt requires immediate action')
-                    )
-                ),
-                React.createElement('div', {className: 'metric-box full-width'},
-                    React.createElement('h3', null, 'Collections Status'),
-                    React.createElement('table', null,
-                        React.createElement('thead', null,
-                            React.createElement('tr', null,
-                                React.createElement('th', null, 'Owner'),
-                                React.createElement('th', null, 'Current'),
-                                React.createElement('th', null, '1-30 Days'),
-                                React.createElement('th', null, '31-60 Days'),
-                                React.createElement('th', null, '61-90 Days'),
-                                React.createElement('th', null, '>90 Days'),
-                                React.createElement('th', null, 'Total'),
-                                React.createElement('th', null, 'Status')
-                            )
-                        ),
-                        React.createElement('tbody', null,
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Owner A'),
-                                React.createElement('td', null, '$168'),
-                                React.createElement('td', null, '$168'),
-                                React.createElement('td', null, '$168'),
-                                React.createElement('td', null, '$168'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '$672'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-critical'}, 'CRITICAL'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Owner B'),
-                                React.createElement('td', null, '$168'),
-                                React.createElement('td', null, '$168'),
-                                React.createElement('td', null, '$168'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '$504'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-urgent'}, 'URGENT'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Owner C'),
-                                React.createElement('td', null, '$168'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '$168'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-current'}, 'CURRENT'))
-                            )
-                        )
-                    )
-                )
-            );
-        }
-
-        function Tab2BankTransactions() {
-            return React.createElement('div', {className: 'tab-content'},
-                React.createElement('div', {className: 'kpi-cards'},
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Total Deposits'),
-                        React.createElement('div', {className: 'value'}, '$85,894'),
-                        React.createElement('div', {className: 'subtext'}, 'Mar 2023 - Apr 2026')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Total Withdrawals'),
-                        React.createElement('div', {className: 'value'}, '$78,887'),
-                        React.createElement('div', {className: 'subtext'}, '')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Number of Transactions'),
-                        React.createElement('div', {className: 'value'}, '575'),
-                        React.createElement('div', {className: 'subtext'}, '')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Intuit Fees Paid'),
-                        React.createElement('div', {className: 'value'}, '$1,759'),
-                        React.createElement('div', {className: 'subtext'}, '169 transactions')
-                    )
-                ),
-                React.createElement('div', {className: 'charts-section'},
-                    React.createElement('div', {className: 'chart-card full-width'},
-                        React.createElement('h2', null, 'Monthly Cash Flow'),
-                        React.createElement('div', {id: 'monthlyFlow'})
-                    )
-                ),
-                React.createElement('div', {className: 'chart-card full-width'},
-                    React.createElement('h2', null, 'Total Spending by Vendor'),
-                    React.createElement('div', {id: 'vendorChart'})
-                ),
-                React.createElement('div', {className: 'callout'},
-                    React.createElement('h3', null, 'Fee Analysis'),
-                    React.createElement('p', null, 'Quickbooks/Intuit and Stellar Bank fees represent significant costs. With 575 total transactions and $1,759 in processing fees, the effective cost per transaction is $3.06. This suggests opportunities to consolidate vendors or negotiate batch rates.')
-                )
-            );
-        }
-
-        function Tab3WhereYourDuesGo() {
-            return React.createElement('div', {className: 'tab-content'},
-                React.createElement('div', {className: 'highlight-card'},
-                    React.createElement('h2', null, 'Total Monthly Income per Household'),
-                    React.createElement('div', {className: 'value'}, '$168')
-                ),
-                React.createElement('div', {className: 'kpi-cards'},
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Total Monthly Cost'),
-                        React.createElement('div', {className: 'value'}, '$225'),
-                        React.createElement('div', {className: 'subtext'}, 'Per household')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Monthly Shortfall'),
-                        React.createElement('div', {className: 'value'}, '-$57'),
-                        React.createElement('div', {className: 'subtext'}, 'Per household')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Highest Expense'),
-                        React.createElement('div', {className: 'value'}, '$93.13'),
-                        React.createElement('div', {className: 'subtext'}, 'Water per household')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Fee Percentage'),
-                        React.createElement('div', {className: 'value'}, '7.9%'),
-                        React.createElement('div', {className: 'subtext'}, '')
-                    )
-                ),
-                React.createElement('div', {className: 'charts-section'},
-                    React.createElement('div', {className: 'chart-card'},
-                        React.createElement('h2', null, 'Spending by Category'),
-                        React.createElement('div', {id: 'duesChart'})
-                    ),
-                    React.createElement('div', {className: 'chart-card'},
-                        React.createElement('h2', null, 'Expense Breakdown'),
-                        React.createElement('div', {id: 'duesPie'})
-                    )
-                ),
-                React.createElement('div', {className: 'metric-box full-width'},
-                    React.createElement('h3', null, 'Per-Household Monthly Breakdown'),
-                    React.createElement('table', null,
-                        React.createElement('thead', null,
-                            React.createElement('tr', null,
-                                React.createElement('th', null, 'Expense Category'),
-                                React.createElement('th', null, 'Per Household'),
-                                React.createElement('th', null, '% of Total')
-                            )
-                        ),
-                        React.createElement('tbody', null,
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Water'),
-                                React.createElement('td', null, '$93.13'),
-                                React.createElement('td', null, '41.4%')
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Property Management'),
-                                React.createElement('td', null, '$32.81'),
-                                React.createElement('td', null, '14.6%')
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Trash Service'),
-                                React.createElement('td', null, '$30.44'),
-                                React.createElement('td', null, '13.5%')
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Landscaping'),
-                                React.createElement('td', null, '$25.06'),
-                                React.createElement('td', null, '11.1%')
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Repairs'),
-                                React.createElement('td', null, '$5.19'),
-                                React.createElement('td', null, '2.3%')
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Insurance'),
-                                React.createElement('td', null, '$4.31'),
-                                React.createElement('td', null, '1.9%')
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Processing Fees'),
-                                React.createElement('td', null, '$5.81'),
-                                React.createElement('td', null, '2.6%')
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Other'),
-                                React.createElement('td', null, '$2.44'),
-                                React.createElement('td', null, '1.1%')
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', {style: {fontWeight: 'bold'}}, 'TOTAL'),
-                                React.createElement('td', {style: {fontWeight: 'bold'}}, '$199.19'),
-                                React.createElement('td', {style: {fontWeight: 'bold'}}, '100%')
-                            )
-                        )
-                    )
-                ),
-                React.createElement('div', {className: 'callout'},
-                    React.createElement('h3', null, 'Why is our total cost more than dues?'),
-                    React.createElement('p', null, 'Current monthly dues are $168/household, but monthly costs average ~$225/household. The $57 shortfall per household ($912/month for 16 households) is being covered by reserve funds accumulated from past years. This is not sustainable long-term.')
-                )
-            );
-        }
-
-        function Tab4Q1BudgetReview() {
-            return React.createElement('div', {className: 'tab-content'},
-                React.createElement('div', {className: 'kpi-cards'},
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Total Q1 Income'),
-                        React.createElement('div', {className: 'value'}, '$7,560'),
-                        React.createElement('div', {className: 'subtext'}, '')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Total Q1 Expenses'),
-                        React.createElement('div', {className: 'value'}, '$9,589'),
-                        React.createElement('div', {className: 'subtext'}, '')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Q1 Variance'),
-                        React.createElement('div', {className: 'value'}, '-$2,029'),
-                        React.createElement('div', {className: 'subtext'}, '')
-                    ),
-                    React.createElement('div', {className: 'kpi-card'},
-                        React.createElement('h3', null, 'Budget vs Actual'),
-                        React.createElement('div', {className: 'value'}, '-26.7%'),
-                        React.createElement('div', {className: 'subtext'}, '')
-                    )
-                ),
-                React.createElement('div', {className: 'chart-card full-width'},
-                    React.createElement('h2', null, 'Budget vs Actual'),
-                    React.createElement('div', {id: 'budgetChart'})
-                ),
-                React.createElement('div', {className: 'metric-box full-width'},
-                    React.createElement('h3', null, 'Category Analysis'),
-                    React.createElement('table', null,
-                        React.createElement('thead', null,
-                            React.createElement('tr', null,
-                                React.createElement('th', null, 'Category'),
-                                React.createElement('th', null, 'Budget'),
-                                React.createElement('th', null, 'Actual'),
-                                React.createElement('th', null, 'Variance'),
-                                React.createElement('th', null, 'Status')
-                            )
-                        ),
-                        React.createElement('tbody', null,
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'HOA Dues'),
-                                React.createElement('td', null, '$8,064'),
-                                React.createElement('td', null, '$7,560'),
-                                React.createElement('td', null, '-$504'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-bad'}, 'Under Target'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Property Management'),
-                                React.createElement('td', null, '$1,575'),
-                                React.createElement('td', null, '$1,575'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-on-track'}, 'On Track'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Water'),
-                                React.createElement('td', null, '$5,959'),
-                                React.createElement('td', null, '$4,193'),
-                                React.createElement('td', null, '-$1,766'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-good'}, 'Under Budget'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Trash'),
-                                React.createElement('td', null, '$1,349'),
-                                React.createElement('td', null, '$974'),
-                                React.createElement('td', null, '-$375'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-good'}, 'Under Budget'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Landscaping'),
-                                React.createElement('td', null, '$1,166'),
-                                React.createElement('td', null, '$1,429'),
-                                React.createElement('td', null, '+$263'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-bad'}, 'Over Budget'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Insurance'),
-                                React.createElement('td', null, '$515'),
-                                React.createElement('td', null, '$623'),
-                                React.createElement('td', null, '+$108'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-bad'}, 'Over Budget'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Bank Fees'),
-                                React.createElement('td', null, '$280'),
-                                React.createElement('td', null, '$257'),
-                                React.createElement('td', null, '-$23'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-good'}, 'Under Budget'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Professional Fees'),
-                                React.createElement('td', null, '$71'),
-                                React.createElement('td', null, '$200'),
-                                React.createElement('td', null, '+$129'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-bad'}, 'Over Budget'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Electric'),
-                                React.createElement('td', null, '$39'),
-                                React.createElement('td', null, '$38'),
-                                React.createElement('td', null, '-$1'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-good'}, 'Under Budget'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Repairs'),
-                                React.createElement('td', null, '$250'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '-$250'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-good'}, 'Under Budget'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Taxes'),
-                                React.createElement('td', null, '$4'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '-$4'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-good'}, 'Under Budget'))
-                            ),
-                            React.createElement('tr', null,
-                                React.createElement('td', null, 'Violations'),
-                                React.createElement('td', null, '$0'),
-                                React.createElement('td', null, '$486'),
-                                React.createElement('td', null, '+$486'),
-                                React.createElement('td', null, React.createElement('span', {className: 'status-badge status-bad'}, 'Over Budget'))
-                            )
-                        )
-                    )
-                ),
-                React.createElement('div', {className: 'callout'},
-                    React.createElement('h3', null, 'Notes on Variance'),
-                    React.createElement('p', null, '• Water variance is positive - cooler weather and early usage monitoring helped'),
-                    React.createElement('br', null),
-                    React.createElement('p', null, '• Landscaping overage due to seasonal spring cleanup (+$263)'),
-                    React.createElement('br', null),
-                    React.createElement('p', null, '• Insurance premium increase noted for next year planning'),
-                    React.createElement('br', null),
-                    React.createElement('p', null, '• Professional fees increase covers compliance/legal review ($200)'),
-                    React.createElement('br', null),
-                    React.createElement('p', null, '• Violations ($486) for community safety enforcement')
-                )
-            );
-        }
-
-        function Tab5ProposedSolutions() {
-            const [duesAmount, setDuesAmount] = React.useState(168);
-            const [selectedDuesMonth, setSelectedDuesMonth] = React.useState('18');
-            const [waterBalance, setWaterBalance] = React.useState(7486.25);
-            const [waterMonth, setWaterMonth] = React.useState('18');
-            const [waterOneTime, setWaterOneTime] = React.useState(false);
-            const [waterExpenses, setWaterExpenses] = React.useState({
-                water: 1490,
-                propertyMgmt: 525,
-                trash: 487,
-                landscaping: 401,
-                fees: 93,
-                other: 189
+        function renderYearChart(yearKey, containerId) {
+            var d = years[yearKey];
+            var chartData = d.data.map(function(item) {
+                return {name: item.name, value: item.value, pct: Math.round(item.value / d.total * 100)};
             });
 
-            function updateDuesMonth(months) {
-                setSelectedDuesMonth(months.toString());
+            function yearBarLabel(props) {
+                var x = props.x; var y = props.y; var w = props.width; var h = props.height; var val = props.value;
+                if (w < 30) return null;
+                return React.createElement('text', {x: x + w/2, y: y + h/2 + 4, textAnchor:'middle', fill:'white', fontSize:9, fontWeight:600}, '$' + (val/1000).toFixed(1) + 'k');
             }
 
-            function updateWaterMonth(months) {
-                setWaterMonth(months.toString());
-            }
-
-            function toggleWaterOneTime(e) {
-                setWaterOneTime(!waterOneTime);
-            }
-
-            function handleDuesChange(e) {
-                setDuesAmount(parseFloat(e.target.value) || 168);
-            }
-
-            function handleWaterBalanceChange(e) {
-                setWaterBalance(parseFloat(e.target.value) || 7486.25);
-            }
-
-            function handleWaterExpenseChange(field, e) {
-                var newValue = parseFloat(e.target.value) || 0;
-                var newExpenses = {};
-                for (var key in waterExpenses) {
-                    newExpenses[key] = waterExpenses[key];
-                }
-                newExpenses[field] = newValue;
-                setWaterExpenses(newExpenses);
-            }
-
-            var annualDuesIncome = duesAmount * 12 * 16;
-            var monthlyExpenses = waterExpenses.water + waterExpenses.propertyMgmt + waterExpenses.trash + waterExpenses.landscaping + waterExpenses.fees + waterExpenses.other;
-            var annualExpenses = monthlyExpenses * 12;
-            var annualNet = annualDuesIncome - annualExpenses;
-
-            var monthlyNet = (duesAmount * 16) - monthlyExpenses;
-            var projectedCash = 6935 + (monthlyNet * 12);
-            var breakEvenDues = Math.ceil((monthlyExpenses / 16) * 100) / 100;
-
-            var waterMonthsNum = parseInt(waterMonth);
-            var monthlyWaterPayment = waterBalance / waterMonthsNum;
-            var perHouseholdWater = monthlyWaterPayment / 16;
-            var payoffDate = new Date();
-            payoffDate.setMonth(payoffDate.getMonth() + waterMonthsNum);
-
-            var schedule = [];
-            for (var i = 1; i <= waterMonthsNum; i++) {
-                var monthDate = new Date();
-                monthDate.setMonth(monthDate.getMonth() + i);
-                schedule.push({
-                    month: i,
-                    date: monthDate.toLocaleDateString('en-US', {year: 'numeric', month: 'short'}),
-                    payment: monthlyWaterPayment,
-                    perHousehold: perHouseholdWater,
-                    remaining: waterBalance - (monthlyWaterPayment * i)
-                });
-            }
-
-            return React.createElement('div', {className: 'tab-content'},
-                React.createElement('div', {className: 'metric-box full-width'},
-                    React.createElement('h3', null, 'What-If Scenario Planner'),
-                    React.createElement('div', {className: 'two-column'},
-                        React.createElement('div', null,
-                            React.createElement('div', {className: 'form-group'},
-                                React.createElement('label', null, 'Monthly Dues Amount: ', React.createElement('span', {className: 'slider-value'}, '$' + duesAmount.toLocaleString())),
-                                React.createElement('input', {type: 'range', min: 150, max: 260, step: 1, value: duesAmount, onChange: function(e) { handleDuesChange(e); }})
-                            ),
-                            React.createElement('div', {className: 'button-group'},
-                                React.createElement('button', {className: 'quick-btn' + (duesAmount == 168 ? ' active' : ''), onClick: function(e) { setDuesAmount(168); }}, 'Current ($168)'),
-                                React.createElement('button', {className: 'quick-btn' + (duesAmount == 200 ? ' active' : ''), onClick: function(e) { setDuesAmount(200); }}, '$200'),
-                                React.createElement('button', {className: 'quick-btn' + (duesAmount == 225 ? ' active' : ''), onClick: function(e) { setDuesAmount(225); }}, '$225 (Break-even)')
-                            ),
-                            React.createElement('div', {className: 'form-group'},
-                                React.createElement('label', null, 'Include Water Payoff Assessment?'),
-                                React.createElement('div', {className: 'toggle-switch'},
-                                    React.createElement('label', {className: 'switch'},
-                                        React.createElement('input', {type: 'checkbox', checked: waterOneTime, onChange: function(e) { toggleWaterOneTime(e); }}),
-                                        React.createElement('span', {className: 'slider'})
-                                    ),
-                                    React.createElement('span', null, waterOneTime ? '$468 per household' : 'No one-time assessment')
-                                )
-                            )
-                        ),
-                        React.createElement('div', null,
-                            React.createElement('div', {className: 'form-group'},
-                                React.createElement('label', null, 'Monthly Expenses'),
-                                React.createElement('div', {style: {fontSize: '0.85rem', color: '#666', marginBottom: '1rem'}},
-                                    'Water: $',
-                                    React.createElement('input', {type: 'number', value: waterExpenses.water, onChange: function(e) { handleWaterExpenseChange('water', e); }, style: {width: '60px', padding: '0.3rem', display: 'inline-block'}})
-                                ),
-                                React.createElement('div', {style: {fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem'}},
-                                    'Property Mgmt: $',
-                                    React.createElement('input', {type: 'number', value: waterExpenses.propertyMgmt, onChange: function(e) { handleWaterExpenseChange('propertyMgmt', e); }, style: {width: '60px', padding: '0.3rem', display: 'inline-block'}})
-                                ),
-                                React.createElement('div', {style: {fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem'}},
-                                    'Trash: $',
-                                    React.createElement('input', {type: 'number', value: waterExpenses.trash, onChange: function(e) { handleWaterExpenseChange('trash', e); }, style: {width: '60px', padding: '0.3rem', display: 'inline-block'}})
-                                ),
-                                React.createElement('div', {style: {fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem'}},
-                                    'Landscaping: $',
-                                    React.createElement('input', {type: 'number', value: waterExpenses.landscaping, onChange: function(e) { handleWaterExpenseChange('landscaping', e); }, style: {width: '60px', padding: '0.3rem', display: 'inline-block'}})
-                                ),
-                                React.createElement('div', {style: {fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem'}},
-                                    'Bank Fees: $',
-                                    React.createElement('input', {type: 'number', value: waterExpenses.fees, onChange: function(e) { handleWaterExpenseChange('fees', e); }, style: {width: '60px', padding: '0.3rem', display: 'inline-block'}})
-                                ),
-                                React.createElement('div', {style: {fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem'}},
-                                    'Other: $',
-                                    React.createElement('input', {type: 'number', value: waterExpenses.other, onChange: function(e) { handleWaterExpenseChange('other', e); }, style: {width: '60px', padding: '0.3rem', display: 'inline-block'}})
-                                )
-                            )
-                        )
-                    ),
-                    React.createElement('div', {className: 'results-box'},
-                        React.createElement('h3', null, 'Annual Impact'),
-                        React.createElement('div', {className: 'result-item'},
-                            React.createElement('span', {className: 'label'}, 'Annual Dues Income (16 households):'),
-                            React.createElement('span', {className: 'value'}, formatCurrency(annualDuesIncome))
-                        ),
-                        React.createElement('div', {className: 'result-item'},
-                            React.createElement('span', {className: 'label'}, 'Annual Operating Expenses:'),
-                            React.createElement('span', {className: 'value'}, formatCurrency(annualExpenses))
-                        ),
-                        React.createElement('div', {className: 'result-item'},
-                            React.createElement('span', {className: 'label'}, 'Annual Net:'),
-                            React.createElement('span', {className: 'value', style: {color: annualNet >= 0 ? '#090' : '#c00'}}, formatCurrency(annualNet))
+            ReactDOM.render(
+                React.createElement(ResponsiveContainer, {width:'100%',height:270},
+                    React.createElement(BarChart, {data:chartData, layout:'vertical', margin:{top:5,right:50,bottom:5,left:80}},
+                        React.createElement(XAxis, {type:'number', tickFormatter: function(v){return '$'+(v/1000).toFixed(0)+'k';}}),
+                        React.createElement(YAxis, {dataKey:'name',type:'category',width:75,tick:{fontSize:10}}),
+                        React.createElement(Tooltip, {formatter: function(v,n,p){return ['$'+v.toLocaleString()+' ('+p.payload.pct+'%)','Amount'];}}),
+                        React.createElement(Bar, {dataKey:'value',label: function(props){
+                            var x = props.x + props.width + 4; var y = props.y + props.height/2 + 4;
+                            return React.createElement('text', {x:x,y:y,fill:'#666',fontSize:9}, props.payload.pct + '%');
+                        }},
+                            chartData.map(function(entry, idx) {
+                                return React.createElement(Cell, {key:'c'+idx, fill:COLORS[idx % COLORS.length]});
+                            })
                         )
                     )
                 ),
-                React.createElement('div', {className: 'forecast-box'},
-                    React.createElement('h3', null, 'Forecast'),
-                    React.createElement('div', {className: 'forecast-items'},
-                        React.createElement('div', {className: 'forecast-item' + (monthlyNet >= 0 ? ' positive' : ' negative')},
-                            React.createElement('h4', null, 'Monthly Net'),
-                            React.createElement('div', {className: 'value'}, formatCurrency(monthlyNet))
-                        ),
-                        React.createElement('div', {className: 'forecast-item' + (projectedCash >= 0 ? ' positive' : ' negative')},
-                            React.createElement('h4', null, '12-Month Projection'),
-                            React.createElement('div', {className: 'value'}, formatCurrency(projectedCash))
-                        ),
-                        React.createElement('div', {className: 'forecast-item'},
-                            React.createElement('h4', null, 'Break-even Dues'),
-                            React.createElement('div', {className: 'value', style: {color: '#2E86AB'}}, '$' + breakEvenDues.toFixed(2))
-                        )
-                    )
-                ),
-                React.createElement('div', {className: 'metric-box full-width'},
-                    React.createElement('h3', null, 'Cost Savings Opportunities'),
-                    React.createElement('div', null,
-                        React.createElement('div', {style: {marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #ddd'}},
-                            React.createElement('h4', {style: {color: '#1F4E79', marginBottom: '0.5rem'}}, '1. Reduce Intuit Processing Fees'),
-                            React.createElement('p', {style: {color: '#666', fontSize: '0.9rem'}}, 'Potential Savings: $780/year ($65/month). Consolidate transactions or negotiate batch rates.')
-                        ),
-                        React.createElement('div', {style: {marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #ddd'}},
-                            React.createElement('h4', {style: {color: '#1F4E79', marginBottom: '0.5rem'}}, '2. Negotiate Stellar Bank Account Fees'),
-                            React.createElement('p', {style: {color: '#666', fontSize: '0.9rem'}}, 'Potential Savings: $400-796/year ($33-66/month). Request fee waiver based on account balance.')
-                        ),
-                        React.createElement('div', {style: {marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #ddd'}},
-                            React.createElement('h4', {style: {color: '#1F4E79', marginBottom: '0.5rem'}}, '3. Review Landscaping Contract'),
-                            React.createElement('p', {style: {color: '#666', fontSize: '0.9rem'}}, 'Potential Savings: $500-1,000/year ($42-83/month). Obtain competitive quotes from 2-3 vendors.')
-                        ),
-                        React.createElement('div', {style: {marginBottom: '1.5rem'}},
-                            React.createElement('h4', {style: {color: '#1F4E79', marginBottom: '0.5rem'}}, '4. Renegotiate Trash Service'),
-                            React.createElement('p', {style: {color: '#666', fontSize: '0.9rem'}}, 'Potential Savings: $400-800/year ($33-67/month). Lock in multi-year rate or explore alternatives.')
-                        )
-                    )
-                ),
-                React.createElement('div', {className: 'metric-box full-width'},
-                    React.createElement('h3', null, 'Water Debt Payoff Plan'),
-                    React.createElement('div', {className: 'two-column'},
-                        React.createElement('div', null,
-                            React.createElement('div', {className: 'form-group'},
-                                React.createElement('label', null, 'Water Balance Owed'),
-                                React.createElement('input', {type: 'number', value: waterBalance, onChange: function(e) { handleWaterBalanceChange(e); }, step: 0.01})
-                            ),
-                            React.createElement('div', {className: 'form-group'},
-                                React.createElement('label', null, 'Custom Payoff Period (months)'),
-                                React.createElement('input', {type: 'text', value: waterMonth, onChange: function(e) { setWaterMonth(e.target.value); }, placeholder: 'Enter number of months'})
-                            ),
-                            React.createElement('div', {className: 'button-group'},
-                                React.createElement('button', {className: 'quick-btn' + (waterMonth == '6' ? ' active' : ''), onClick: function(e) { updateWaterMonth(6); }}, '6 months'),
-                                React.createElement('button', {className: 'quick-btn' + (waterMonth == '18' ? ' active' : ''), onClick: function(e) { updateWaterMonth(18); }}, '18 months'),
-                                React.createElement('button', {className: 'quick-btn' + (waterMonth == '24' ? ' active' : ''), onClick: function(e) { updateWaterMonth(24); }}, '24 months'),
-                                React.createElement('button', {className: 'quick-btn' + (waterMonth == '36' ? ' active' : ''), onClick: function(e) { updateWaterMonth(36); }}, '36 months')
-                            )
-                        ),
-                        React.createElement('div', null,
-                            React.createElement('div', {className: 'form-group'},
-                                React.createElement('label', null, 'One-Time Assessment Option'),
-                                React.createElement('div', {className: 'toggle-switch'},
-                                    React.createElement('label', {className: 'switch'},
-                                        React.createElement('input', {type: 'checkbox', checked: waterOneTime, onChange: function(e) { toggleWaterOneTime(e); }}),
-                                        React.createElement('span', {className: 'slider'})
-                                    ),
-                                    React.createElement('span', null, waterOneTime ? 'Yes - $468/household' : 'No - monthly additions')
-                                )
-                            ),
-                            React.createElement('div', {className: 'results-box'},
-                                React.createElement('h3', null, 'Payment Details'),
-                                React.createElement('div', {className: 'result-item'},
-                                    React.createElement('span', {className: 'label'}, 'Monthly Payment:'),
-                                    React.createElement('span', {className: 'value'}, formatCurrency(monthlyWaterPayment))
-                                ),
-                                React.createElement('div', {className: 'result-item'},
-                                    React.createElement('span', {className: 'label'}, 'Per Household/Month:'),
-                                    React.createElement('span', {className: 'value'}, formatCurrency(perHouseholdWater))
-                                ),
-                                React.createElement('div', {className: 'result-item'},
-                                    React.createElement('span', {className: 'label'}, 'Payoff Date:'),
-                                    React.createElement('span', {className: 'value'}, payoffDate.toLocaleDateString('en-US', {year: 'numeric', month: 'long'}))
-                                )
-                            )
-                        )
-                    ),
-                    React.createElement('div', {className: 'payment-schedule-wrapper'},
-                        React.createElement('table', null,
-                            React.createElement('thead', null,
-                                React.createElement('tr', null,
-                                    React.createElement('th', null, 'Month'),
-                                    React.createElement('th', null, 'Date'),
-                                    React.createElement('th', null, 'Payment'),
-                                    React.createElement('th', null, 'Per Household'),
-                                    React.createElement('th', null, 'Remaining')
-                                )
-                            ),
-                            React.createElement('tbody', null,
-                                schedule.map(function(item, idx) {
-                                    return React.createElement('tr', {key: idx},
-                                        React.createElement('td', null, 'Month ' + item.month),
-                                        React.createElement('td', null, item.date),
-                                        React.createElement('td', null, formatCurrency(item.payment)),
-                                        React.createElement('td', null, formatCurrency(item.perHousehold)),
-                                        React.createElement('td', null, formatCurrency(Math.max(0, item.remaining)))
-                                    );
-                                })
-                            )
-                        )
-                    )
-                )
+                document.getElementById(containerId)
             );
         }
 
-        function App() {
-            const [activeTab, setActiveTab] = React.useState(0);
+        renderYearChart(2023, 'chart_year2023');
+        renderYearChart(2024, 'chart_year2024');
+        renderYearChart(2025, 'chart_year2025');
+        renderYearChart(2026, 'chart_year2026');
 
-            function handleTabClick(idx) {
-                setActiveTab(idx);
-            }
+        // ===== TAB 2 CHARTS =====
 
-            var tabs = [
-                {name: 'Financial Health', component: Tab1FinancialHealth},
-                {name: 'Bank Transactions', component: Tab2BankTransactions},
-                {name: "Where Your Dues Go", component: Tab3WhereYourDuesGo},
-                {name: 'Q1 Budget Review', component: Tab4Q1BudgetReview},
-                {name: 'Proposed Solutions', component: Tab5ProposedSolutions}
-            ];
+        // Monthly Cash Flow
+        var monthlyFlow = [
+            {month:'Mar 23',deposits:840,withdrawals:0},{month:'Apr 23',deposits:336,withdrawals:346},
+            {month:'May 23',deposits:704,withdrawals:714},{month:'Jun 23',deposits:1240,withdrawals:0},
+            {month:'Jul 23',deposits:536,withdrawals:165},{month:'Aug 23',deposits:2868,withdrawals:329},
+            {month:'Sep 23',deposits:872,withdrawals:761},{month:'Oct 23',deposits:1208,withdrawals:317},
+            {month:'Nov 23',deposits:1544,withdrawals:253},{month:'Dec 23',deposits:1376,withdrawals:247},
+            {month:'Jan 24',deposits:1344,withdrawals:456},{month:'Feb 24',deposits:1712,withdrawals:1440},
+            {month:'Mar 24',deposits:3224,withdrawals:1649},{month:'Apr 24',deposits:2384,withdrawals:2677},
+            {month:'May 24',deposits:1680,withdrawals:1907},{month:'Jun 24',deposits:4936,withdrawals:1477},
+            {month:'Jul 24',deposits:1680,withdrawals:1685},{month:'Aug 24',deposits:2016,withdrawals:1931},
+            {month:'Sep 24',deposits:3056,withdrawals:2012},{month:'Oct 24',deposits:3528,withdrawals:1485},
+            {month:'Nov 24',deposits:1848,withdrawals:1541},{month:'Dec 24',deposits:2921,withdrawals:1949},
+            {month:'Jan 25',deposits:2016,withdrawals:605},{month:'Feb 25',deposits:3864,withdrawals:2334},
+            {month:'Mar 25',deposits:1848,withdrawals:4969},{month:'Apr 25',deposits:2520,withdrawals:7412},
+            {month:'May 25',deposits:4730,withdrawals:8478},{month:'Jun 25',deposits:2520,withdrawals:1511},
+            {month:'Jul 25',deposits:2352,withdrawals:2130},{month:'Aug 25',deposits:2856,withdrawals:4736},
+            {month:'Sep 25',deposits:3528,withdrawals:1542},{month:'Oct 25',deposits:2856,withdrawals:5432},
+            {month:'Nov 25',deposits:2184,withdrawals:3135},{month:'Dec 25',deposits:3696,withdrawals:2049},
+            {month:'Jan 26',deposits:2352,withdrawals:1642},{month:'Feb 26',deposits:2520,withdrawals:2999},
+            {month:'Mar 26',deposits:2688,withdrawals:5134},{month:'Apr 26',deposits:1512,withdrawals:1440}
+        ];
 
-            return React.createElement('div', null,
-                React.createElement('div', {className: 'nav-tabs'},
-                    tabs.map(function(tab, idx) {
-                        return React.createElement('button', {
-                            key: idx,
-                            className: (idx === activeTab ? 'active' : '') + ' nav-button',
-                            onClick: function(e) { handleTabClick(idx); }
-                        }, tab.name);
-                    })
-                ),
-                React.createElement('div', {className: 'container'},
-                    React.createElement(tabs[activeTab].component),
-                    React.createElement('div', {className: 'footer'}, 'Last Updated: April 7, 2026')
+        ReactDOM.render(
+            React.createElement(ResponsiveContainer, {width:'100%',height:340},
+                React.createElement(ComposedChart, {data:monthlyFlow, margin:{top:10,right:20,bottom:80,left:20}},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {dataKey:'month',angle:-45,textAnchor:'end',height:80,tick:{fontSize:10}}),
+                    React.createElement(YAxis, {tickFormatter: function(v){return '$'+v.toLocaleString();}}),
+                    React.createElement(Tooltip, {formatter: function(v){return '$'+v.toLocaleString();}}),
+                    React.createElement(Legend, null),
+                    React.createElement(Bar, {dataKey:'deposits',fill:'#27AE60',name:'Deposits'}),
+                    React.createElement(Bar, {dataKey:'withdrawals',fill:'#E74C3C',name:'Withdrawals'})
                 )
-            );
-        }
+            ),
+            document.getElementById('chart_cashFlow')
+        );
 
-        ReactDOM.render(React.createElement(App), document.getElementById('root'));
+        // Vendor Spending - horizontal bars with different colors and value labels
+        var vendorData = [
+            {vendor:'City of Houston (Water)',amount:27124},
+            {vendor:'LLA Property Partners',amount:16321},
+            {vendor:'Saint Clair & Sons (Landscaping)',amount:14168},
+            {vendor:'Texas Pride (Trash)',amount:12853},
+            {vendor:'Repairs (Various)',amount:2130},
+            {vendor:'Stellar Bank (Fees)',amount:1856},
+            {vendor:'Intuit/QuickBooks (Fees)',amount:1759},
+            {vendor:'US Liability Insurance',amount:1448},
+            {vendor:'Anne Beauregard (Bookkeeping)',amount:1013},
+            {vendor:'NRG/Reliant (Electric)',amount:189},
+            {vendor:'Harris County (Taxes)',amount:26}
+        ];
 
-        // Render charts after a brief delay to ensure DOM is ready
-        setTimeout(function() {
-            // Tab 1 - Income vs Expenses
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 300},
-                    React.createElement(BarChart, {data: monthlyData},
-                        React.createElement(CartesianGrid, {strokeDasharray: '3 3'}),
-                        React.createElement(XAxis, {dataKey: 'month'}),
-                        React.createElement(YAxis, null),
-                        React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
-                        React.createElement(Legend, null),
-                        React.createElement(Bar, {
-                            dataKey: 'income',
-                            fill: '#27AE60',
-                            name: 'Income',
-                            label: {position: 'top', formatter: function(value) { return '$' + value.toLocaleString(); }, fill: '#333', fontSize: 11}
-                        }),
-                        React.createElement(Bar, {
-                            dataKey: 'expenses',
-                            fill: '#E74C3C',
-                            name: 'Expenses',
-                            label: {position: 'top', formatter: function(value) { return '$' + value.toLocaleString(); }, fill: '#333', fontSize: 11}
+        ReactDOM.render(
+            React.createElement(ResponsiveContainer, {width:'100%',height:340},
+                React.createElement(BarChart, {data:vendorData, layout:'vertical', margin:{top:5,right:80,bottom:5,left:200}},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {type:'number',tickFormatter: function(v){return '$'+(v/1000).toFixed(0)+'k';}}),
+                    React.createElement(YAxis, {dataKey:'vendor',type:'category',width:190,tick:{fontSize:11}}),
+                    React.createElement(Tooltip, {formatter: function(v){return '$'+v.toLocaleString();}}),
+                    React.createElement(Bar, {dataKey:'amount', label: function(props){
+                        return React.createElement('text', {x:props.x+props.width+5, y:props.y+props.height/2+4, fill:'#333', fontSize:11, fontWeight:600}, '$'+props.value.toLocaleString());
+                    }},
+                        vendorData.map(function(entry, idx) {
+                            return React.createElement(Cell, {key:'v'+idx, fill:COLORS[idx % COLORS.length]});
                         })
                     )
-                ),
-                document.getElementById('incomeExpenses')
-            );
+                )
+            ),
+            document.getElementById('chart_vendor')
+        );
 
-            // Tab 1 - Cash Balance
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 300},
-                    React.createElement(LineChart, {data: cashBalanceData},
-                        React.createElement(CartesianGrid, {strokeDasharray: '3 3'}),
-                        React.createElement(XAxis, {dataKey: 'period'}),
-                        React.createElement(YAxis, null),
-                        React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
-                        React.createElement(Line, {
-                            type: 'monotone',
-                            dataKey: 'balance',
-                            stroke: '#2E86AB',
-                            fill: '#E8F4F8',
-                            name: 'Cash Balance',
-                            isAnimationActive: true,
-                            label: {position: 'top', formatter: function(value) { return '$' + value.toLocaleString(); }, fill: '#333', fontSize: 10}
-                        })
-                    )
-                ),
-                document.getElementById('cashBalance')
-            );
+        // ===== TAB 3 CHARTS =====
 
-            // Tab 1 - Pie charts 2023
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 250},
-                    React.createElement(PieChart, null,
-                        React.createElement(Pie, {
-                            data: expensesByYear[2023],
-                            cx: '50%',
-                            cy: '50%',
-                            labelLine: false,
-                            label: function(entry) { return entry.name + ' (' + ((entry.value/expenseTotals[2023])*100).toFixed(1) + '%)'; },
-                            outerRadius: 80,
-                            fill: '#8884d8',
-                            dataKey: 'value'
-                        },
-                            expensesByYear[2023].map(function(entry, index) {
-                                return React.createElement(Cell, {key: 'cell-' + index, fill: colors[index % colors.length]});
-                            })
-                        )
-                    )
-                ),
-                document.getElementById('pie2023')
-            );
+        var duesBreakdown = [
+            {category:'Water',amount:93.13},
+            {category:'Prop Mgmt',amount:32.81},
+            {category:'Trash',amount:30.44},
+            {category:'Landscaping',amount:25.06},
+            {category:'Fees',amount:5.81},
+            {category:'Repairs',amount:5.19},
+            {category:'Insurance',amount:4.31},
+            {category:'Other',amount:2.44}
+        ];
 
-            // Tab 1 - Pie charts 2024
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 250},
-                    React.createElement(PieChart, null,
-                        React.createElement(Pie, {
-                            data: expensesByYear[2024],
-                            cx: '50%',
-                            cy: '50%',
-                            labelLine: false,
-                            label: function(entry) { return entry.name + ' (' + ((entry.value/expenseTotals[2024])*100).toFixed(1) + '%)'; },
-                            outerRadius: 80,
-                            fill: '#8884d8',
-                            dataKey: 'value'
-                        },
-                            expensesByYear[2024].map(function(entry, index) {
-                                return React.createElement(Cell, {key: 'cell-' + index, fill: colors[index % colors.length]});
-                            })
-                        )
-                    )
-                ),
-                document.getElementById('pie2024')
-            );
+        var duesTotal = 199.19;
 
-            // Tab 1 - Pie charts 2025
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 250},
-                    React.createElement(PieChart, null,
-                        React.createElement(Pie, {
-                            data: expensesByYear[2025],
-                            cx: '50%',
-                            cy: '50%',
-                            labelLine: false,
-                            label: function(entry) { return entry.name + ' (' + ((entry.value/expenseTotals[2025])*100).toFixed(1) + '%)'; },
-                            outerRadius: 80,
-                            fill: '#8884d8',
-                            dataKey: 'value'
-                        },
-                            expensesByYear[2025].map(function(entry, index) {
-                                return React.createElement(Cell, {key: 'cell-' + index, fill: colors[index % colors.length]});
-                            })
-                        )
-                    )
-                ),
-                document.getElementById('pie2025')
-            );
+        // Bar chart with dollar labels
+        ReactDOM.render(
+            React.createElement(ResponsiveContainer, {width:'100%',height:340},
+                React.createElement(BarChart, {data:duesBreakdown, layout:'vertical', margin:{top:5,right:60,bottom:5,left:100}},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {type:'number',tickFormatter: function(v){return '$'+v;}}),
+                    React.createElement(YAxis, {dataKey:'category',type:'category',width:90,tick:{fontSize:11}}),
+                    React.createElement(Tooltip, {formatter: function(v){return '$'+v.toFixed(2);}}),
+                    React.createElement(Bar, {dataKey:'amount',fill:'#2E86AB',label: function(props){
+                        return React.createElement('text', {x:props.x+props.width+5, y:props.y+props.height/2+4, fill:'#333', fontSize:11, fontWeight:600}, '$'+props.value.toFixed(2));
+                    }})
+                )
+            ),
+            document.getElementById('chart_duesBar')
+        );
 
-            // Tab 1 - Pie charts 2026
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 250},
-                    React.createElement(PieChart, null,
-                        React.createElement(Pie, {
-                            data: expensesByYear[2026],
-                            cx: '50%',
-                            cy: '50%',
-                            labelLine: false,
-                            label: function(entry) { return entry.name + ' (' + ((entry.value/expenseTotals[2026])*100).toFixed(1) + '%)'; },
-                            outerRadius: 80,
-                            fill: '#8884d8',
-                            dataKey: 'value'
-                        },
-                            expensesByYear[2026].map(function(entry, index) {
-                                return React.createElement(Cell, {key: 'cell-' + index, fill: colors[index % colors.length]});
-                            })
-                        )
-                    )
-                ),
-                document.getElementById('pie2026')
-            );
-
-            // Tab 2 - Monthly Cash Flow
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 300},
-                    React.createElement(ComposedChart, {data: monthlyFlowData},
-                        React.createElement(CartesianGrid, {strokeDasharray: '3 3'}),
-                        React.createElement(XAxis, {dataKey: 'month'}),
-                        React.createElement(YAxis, null),
-                        React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
-                        React.createElement(Legend, null),
-                        React.createElement(Bar, {
-                            dataKey: 'deposits',
-                            fill: '#27AE60',
-                            name: 'Deposits',
-                            label: {position: 'top', formatter: function(value) { return value > 0 ? '$' + value.toLocaleString() : ''; }, fill: '#333', fontSize: 9}
-                        }),
-                        React.createElement(Bar, {
-                            dataKey: 'withdrawals',
-                            fill: '#E74C3C',
-                            name: 'Withdrawals',
-                            label: {position: 'top', formatter: function(value) { return value > 0 ? '$' + value.toLocaleString() : ''; }, fill: '#333', fontSize: 9}
-                        })
-                    )
-                ),
-                document.getElementById('monthlyFlow')
-            );
-
-            // Tab 2 - Vendor Chart
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 400},
-                    React.createElement(BarChart, {
-                        data: vendorData,
-                        layout: 'vertical',
-                        margin: {top: 5, right: 30, left: 350, bottom: 5}
+        // Pie chart with percentage labels
+        ReactDOM.render(
+            React.createElement(ResponsiveContainer, {width:'100%',height:340},
+                React.createElement(PieChart, null,
+                    React.createElement(Pie, {
+                        data:duesBreakdown.map(function(d){return {name:d.category,value:d.amount};}),
+                        cx:'50%',cy:'50%',outerRadius:110,
+                        label: function(entry){return entry.name + ' ' + Math.round(entry.value/duesTotal*100) + '%';},
+                        labelLine:true,
+                        dataKey:'value'
                     },
-                        React.createElement(CartesianGrid, {strokeDasharray: '3 3'}),
-                        React.createElement(XAxis, {type: 'number'}),
-                        React.createElement(YAxis, {dataKey: 'vendor', type: 'category', width: 340, tick: {fontSize: 11}}),
-                        React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
-                        React.createElement(Bar, {
-                            dataKey: 'amount',
-                            fill: '#2E86AB',
-                            label: {position: 'right', formatter: function(value) { return '$' + value.toLocaleString(); }, fill: '#333', fontSize: 10},
-                            radius: [0, 8, 8, 0]
-                        },
-                            vendorData.map(function(entry, index) {
-                                return React.createElement(Cell, {key: 'cell-' + index, fill: COLORS_VENDORS[index % COLORS_VENDORS.length]});
-                            })
-                        )
-                    )
-                ),
-                document.getElementById('vendorChart')
-            );
-
-            // Tab 3 - Dues Breakdown Bar Chart
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 300},
-                    React.createElement(BarChart, {data: duesBreakdown},
-                        React.createElement(CartesianGrid, {strokeDasharray: '3 3'}),
-                        React.createElement(XAxis, {dataKey: 'category', angle: -45, textAnchor: 'end', height: 100}),
-                        React.createElement(YAxis, null),
-                        React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toFixed(2); }}),
-                        React.createElement(Bar, {
-                            dataKey: 'amount',
-                            fill: '#2E86AB',
-                            label: {position: 'top', formatter: function(value) { return '$' + value.toFixed(2); }, fill: '#333', fontSize: 10}
+                        duesBreakdown.map(function(entry, idx){
+                            return React.createElement(Cell, {key:'p'+idx, fill:COLORS[idx % COLORS.length]});
                         })
-                    )
-                ),
-                document.getElementById('duesChart')
-            );
+                    ),
+                    React.createElement(Tooltip, {formatter: function(v){return '$'+v.toFixed(2);}})
+                )
+            ),
+            document.getElementById('chart_duesPie')
+        );
 
-            // Tab 3 - Dues Breakdown Pie Chart
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 300},
-                    React.createElement(PieChart, null,
-                        React.createElement(Pie, {
-                            data: duesBreakdown,
-                            cx: '50%',
-                            cy: '50%',
-                            labelLine: false,
-                            label: function(entry) { return entry.category + ' (' + ((entry.amount/199.19)*100).toFixed(1) + '%)'; },
-                            outerRadius: 80,
-                            fill: '#8884d8',
-                            dataKey: 'amount'
-                        },
-                            duesBreakdown.map(function(entry, index) {
-                                return React.createElement(Cell, {key: 'cell-' + index, fill: colors[index % colors.length]});
-                            })
-                        )
-                    )
-                ),
-                document.getElementById('duesPie')
-            );
+        // ===== TAB 4 CHARTS =====
 
-            // Tab 4 - Budget vs Actual
-            ReactDOM.render(
-                React.createElement(ResponsiveContainer, {width: '100%', height: 400},
-                    React.createElement(BarChart, {data: budgetData, margin: {top: 20, right: 30, left: 20, bottom: 100}},
-                        React.createElement(CartesianGrid, {strokeDasharray: '3 3'}),
-                        React.createElement(XAxis, {dataKey: 'category', angle: -45, textAnchor: 'end', height: 100, interval: 0}),
-                        React.createElement(YAxis, null),
-                        React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
-                        React.createElement(Legend, null),
-                        React.createElement(Bar, {
-                            dataKey: 'budget',
-                            fill: '#95B8D1',
-                            name: 'Budget',
-                            label: {position: 'top', formatter: function(value) { return '$' + value.toLocaleString(); }, fill: '#333', fontSize: 9}
-                        }),
-                        React.createElement(Bar, {
-                            dataKey: 'actual',
-                            fill: '#2E86AB',
-                            name: 'Actual',
-                            label: {position: 'top', formatter: function(value) { return '$' + value.toLocaleString(); }, fill: '#333', fontSize: 9}
-                        })
-                    )
-                ),
-                document.getElementById('budgetChart')
-            );
-        }, 100);
+        var budgetData = [
+            {category:'HOA Dues',budget:8064,actual:7560},
+            {category:'Prop Mgmt',budget:1575,actual:1575},
+            {category:'Water',budget:5959,actual:4193},
+            {category:'Trash',budget:1349,actual:974},
+            {category:'Landscaping',budget:1166,actual:1429},
+            {category:'Insurance',budget:515,actual:623},
+            {category:'Bank Fees',budget:280,actual:257},
+            {category:'Prof Fees',budget:71,actual:200},
+            {category:'Electric',budget:39,actual:38},
+            {category:'Repairs',budget:250,actual:0},
+            {category:'Taxes',budget:4,actual:0},
+            {category:'Violations',budget:0,actual:486}
+        ];
+
+        function budgetLabel(props) {
+            var x = props.x; var y = props.y; var w = props.width; var val = props.value;
+            if (val === 0) return null;
+            return React.createElement('text', {x: x + w/2, y: y - 5, textAnchor:'middle', fill:'#333', fontSize:9, fontWeight:600}, '$' + val.toLocaleString());
+        }
+
+        ReactDOM.render(
+            React.createElement(ResponsiveContainer, {width:'100%',height:340},
+                React.createElement(BarChart, {data:budgetData, margin:{top:25,right:20,bottom:80,left:20}},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {dataKey:'category',angle:-45,textAnchor:'end',height:80,tick:{fontSize:10}}),
+                    React.createElement(YAxis, {tickFormatter: function(v){return '$'+v.toLocaleString();}}),
+                    React.createElement(Tooltip, {formatter: function(v){return '$'+v.toLocaleString();}}),
+                    React.createElement(Legend, null),
+                    React.createElement(Bar, {dataKey:'budget',fill:'#95A5A6',name:'Q1 Budget',label:budgetLabel}),
+                    React.createElement(Bar, {dataKey:'actual',fill:'#1F4E79',name:'Q1 Actual',label:budgetLabel})
+                )
+            ),
+            document.getElementById('chart_budget')
+        );
+
+    </script>
+
+    <script>
+        // ===== TAB SWITCHING =====
+        function switchTab(tabId, btn) {
+            var contents = document.getElementsByClassName('tab-content');
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('active');
+            }
+            var tabs = document.getElementsByClassName('nav-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // ===== SCENARIO PLANNER =====
+        function updateScenario() {
+            var dues = parseFloat(document.getElementById('duesSlider').value);
+            document.getElementById('duesValue').textContent = dues;
+
+            var useAssessment = document.getElementById('assessmentToggle').checked;
+            document.getElementById('assessmentInfo').className = useAssessment ? 'metric-card' : 'metric-card hidden';
+
+            var water = parseFloat(document.getElementById('sc_water').value) || 0;
+            var pm = parseFloat(document.getElementById('sc_propmgmt').value) || 0;
+            var trash = parseFloat(document.getElementById('sc_trash').value) || 0;
+            var land = parseFloat(document.getElementById('sc_landscape').value) || 0;
+            var fees = parseFloat(document.getElementById('sc_fees').value) || 0;
+            var other = parseFloat(document.getElementById('sc_other').value) || 0;
+
+            var monthlyExp = water + pm + trash + land + fees + other;
+            var monthlyInc = dues * 16;
+            var annualInc = monthlyInc * 12;
+            var annualExp = monthlyExp * 12;
+            var annualNet = annualInc - annualExp;
+
+            document.getElementById('sc_income').textContent = '$' + annualInc.toLocaleString();
+            document.getElementById('sc_expenses').textContent = '$' + annualExp.toLocaleString();
+            var netEl = document.getElementById('sc_net');
+            netEl.textContent = (annualNet < 0 ? '-' : '') + '$' + Math.abs(annualNet).toLocaleString();
+            netEl.style.color = annualNet >= 0 ? '#27AE60' : '#E74C3C';
+
+            // Forecast
+            var monthlyNet = monthlyInc - monthlyExp;
+            var projected = 6935 + (monthlyNet * 12);
+            var breakeven = Math.ceil(monthlyExp / 16);
+
+            document.getElementById('fc_monthly_val').textContent = (monthlyNet < 0 ? '-' : '+') + '$' + Math.abs(monthlyNet).toLocaleString();
+            document.getElementById('fc_monthly_val').style.color = monthlyNet >= 0 ? '#27AE60' : '#E74C3C';
+            document.getElementById('fc_monthly').className = 'forecast-card ' + (monthlyNet >= 0 ? 'positive' : 'negative');
+
+            document.getElementById('fc_projected_val').textContent = (projected < 0 ? '-' : '') + '$' + Math.abs(Math.round(projected)).toLocaleString();
+            document.getElementById('fc_projected_val').style.color = projected >= 0 ? '#27AE60' : '#E74C3C';
+            document.getElementById('fc_projected').className = 'forecast-card ' + (projected >= 0 ? 'positive' : 'negative');
+
+            document.getElementById('fc_breakeven_val').textContent = '$' + breakeven;
+        }
+
+        function setDues(amount) {
+            document.getElementById('duesSlider').value = amount;
+            var btns = document.getElementById('duesButtons').getElementsByClassName('quick-btn');
+            for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+            if (event && event.target) event.target.classList.add('active');
+            updateScenario();
+        }
+
+        // ===== WATER PAYOFF PLAN =====
+        function updateWaterPlan() {
+            var balance = parseFloat(document.getElementById('waterBalance').value) || 0;
+            var months = parseInt(document.getElementById('waterMonths').value) || 18;
+            var oneTime = document.getElementById('waterOneTimeToggle').checked;
+
+            document.getElementById('waterOneTimeInfo').className = oneTime ? '' : 'hidden';
+
+            var monthly = balance / months;
+            var perHH = monthly / 16;
+
+            document.getElementById('wp_monthly').textContent = '$' + monthly.toFixed(0);
+            document.getElementById('wp_perHH').textContent = '$' + perHH.toFixed(0);
+
+            var now = new Date();
+            var payoff = new Date(now.getFullYear(), now.getMonth() + months, 1);
+            document.getElementById('wp_date').textContent = payoff.toLocaleDateString('en-US', {year:'numeric',month:'short'});
+
+            var tbody = document.getElementById('waterScheduleBody');
+            tbody.innerHTML = '';
+            var remaining = balance;
+            var showMax = Math.min(months, 36);
+            for (var i = 1; i <= showMax; i++) {
+                var d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+                remaining = Math.max(0, remaining - monthly);
+                var row = document.createElement('tr');
+                row.innerHTML = '<td>' + d.toLocaleDateString('en-US', {year:'numeric',month:'short'}) + '</td><td>$' + monthly.toFixed(2) + '</td><td>$' + remaining.toFixed(2) + '</td>';
+                tbody.appendChild(row);
+            }
+            if (months > 36) {
+                var row = document.createElement('tr');
+                row.innerHTML = '<td colspan="3" style="text-align:center;font-style:italic;">... (' + (months - 36) + ' more months)</td>';
+                tbody.appendChild(row);
+            }
+        }
+
+        function setWaterMonths(months) {
+            document.getElementById('waterMonths').value = months;
+            var btns = document.getElementById('waterButtons').getElementsByClassName('quick-btn');
+            for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+            if (event && event.target) event.target.classList.add('active');
+            updateWaterPlan();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateScenario();
+            updateWaterPlan();
+        });
     </script>
 </body>
 </html>

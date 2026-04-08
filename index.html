@@ -1,382 +1,2059 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Martin Court HOA — Financial Dashboard</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/prop-types@15/prop-types.min.js"></script>
-<script src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
-<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#1a1a2e}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f0f2f5}::-webkit-scrollbar-thumb{background:#b0b8c4;border-radius:3px}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.fade-in{animation:fadeIn .4s ease-out}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Court HOA - Financial Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1F4E79 0%, #2E86AB 100%);
+            color: white;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .nav-tab {
+            flex: 0 0 auto;
+            padding: 16px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background: #f9f9f9;
+            color: #1F4E79;
+        }
+
+        .nav-tab.active {
+            color: #1F4E79;
+            border-bottom-color: #1F4E79;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+        }
+
+        .metric-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1F4E79;
+            margin-bottom: 4px;
+        }
+
+        .metric-subtext {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 400px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .finding-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-left: 4px solid #FF6B6B;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .finding-card.warning {
+            border-left-color: #FFD93D;
+        }
+
+        .finding-card.alert {
+            border-left-color: #FF6B6B;
+        }
+
+        .finding-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .finding-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .collections-section {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .collections-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        th {
+            background: #1F4E79;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge.critical {
+            background: #FFE5E5;
+            color: #D32F2F;
+        }
+
+        .badge.urgent {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .badge.current {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .penalty-amount {
+            color: #D32F2F;
+            font-weight: 600;
+        }
+
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .transaction-table th {
+            background: #2E86AB;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .transaction-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .transaction-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .transaction-deposit {
+            color: #27AE60;
+        }
+
+        .transaction-withdrawal {
+            color: #E74C3C;
+        }
+
+        .scrollable-table {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="month"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="month"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #1F4E79;
+            box-shadow: 0 0 0 3px rgba(31, 78, 121, 0.1);
+        }
+
+        button {
+            background: #1F4E79;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #2E86AB;
+        }
+
+        button.secondary {
+            background: #666;
+        }
+
+        button.secondary:hover {
+            background: #555;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .savings-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #27AE60;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .savings-amount {
+            color: #27AE60;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1F4E79;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1F4E79;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1F4E79;
+            margin-top: 8px;
+        }
+
+        .quick-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .quick-btn.active {
+            background: #1F4E79;
+            color: white;
+            border-color: #1F4E79;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-over {
+            background: #FFE5E5;
+            color: #D32F2F;
+        }
+
+        .status-ontrack {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .status-under {
+            background: #D1ECF1;
+            color: #0C5460;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .owner-row {
+            display: grid;
+            grid-template-columns: 120px repeat(5, 1fr) 120px;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .owner-row input {
+            padding: 8px;
+        }
+
+        .horizontal-chart {
+            width: 100%;
+            height: 300px;
+        }
+
+        .fee-callout {
+            background: linear-gradient(135deg, #FFF3CD 0%, #FFFBEA 100%);
+            border-left: 4px solid #FF9800;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 20px 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .fee-amount {
+            font-weight: 700;
+            color: #D84315;
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 24px 0 16px 0;
+            border-bottom: 2px solid #1F4E79;
+            padding-bottom: 10px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .comparison-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border-top: 3px solid #1F4E79;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .comparison-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .comparison-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1F4E79;
+        }
+
+        .comparison-sub {
+            font-size: 13px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .toggle-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .payment-schedule {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .payment-schedule th {
+            background: #2E86AB;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .payment-schedule td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 12px;
+        }
+
+        .data-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .month-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .month-selector input,
+        .month-selector select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .delete-btn {
+            background: #E74C3C;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #C0392B;
+        }
+
+        .add-owner-btn {
+            background: #27AE60;
+        }
+
+        .add-owner-btn:hover {
+            background: #229954;
+        }
+
+        .export-section {
+            background: linear-gradient(135deg, #E8F4F8 0%, #F0F9FB 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .currency {
+            color: #1F4E79;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        ul {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        ul li {
+            margin-bottom: 6px;
+        }
+
+        p {
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-const {useState,useMemo}=React;
-const {BarChart,Bar,PieChart,Pie,Cell,XAxis,YAxis,CartesianGrid,Tooltip,Legend,ResponsiveContainer,AreaChart,Area}=Recharts;
-
-const UNITS=16, CURRENT_DUES=168;
-const C={primary:'#1F4E79',accent:'#2E86AB',danger:'#C0392B',warning:'#E67E22',success:'#27AE60',muted:'#95A5A6',dark:'#2C3E50'};
-const PC=['#1F4E79','#2E86AB','#27AE60','#E67E22','#C0392B','#8E44AD','#F39C12','#1ABC9C','#BDC3C7','#D35400','#7F8C8D'];
-
-const plData=[{year:'2023',income:8652,expenses:2051},{year:'2024',income:28560,expenses:19796},{year:'2025',income:33768,expenses:43131},{year:'2026 (ann.)',income:30240,expenses:39101}];
-const balData=[{period:'Dec 2023',cash:8182,equity:6550},{period:'Dec 2024',cash:18513,equity:15313},{period:'Dec 2025',cash:9151,equity:5951},{period:'Mar 2026',cash:6935,equity:3735}];
-const exp2025=[{name:'Water',value:22931,pct:53.2},{name:'Prop Mgmt',value:6300,pct:14.6},{name:'Trash',value:5789,pct:13.4},{name:'Landscaping',value:5207,pct:12.1},{name:'Bank Fees',value:1132,pct:2.6},{name:'Insurance',value:824,pct:1.9},{name:'Other',value:948,pct:2.2}];
-const mQ1=[{month:'Jan 26',income:2352,expenses:1642,net:710},{month:'Feb 26',income:2688,expenses:3005,net:-317},{month:'Mar 26',income:2520,expenses:5128,net:-2608}];
-const arRows=[{owner:'Pacheco, Mercedes',current:162,d30:168,d60:168,d90:168,over90:0,total:666},{owner:'Lathaphasavang, Nicko',current:162,d30:168,d60:168,d90:0,over90:0,total:498},{owner:'Toller M. & Glass K.',current:162,d30:0,d60:0,d90:0,over90:0,total:162}];
-const bva=[{cat:'HOA Dues (Income)',actual:7560,budget:8064},{cat:'Property Mgmt',actual:1575,budget:1575},{cat:'Water',actual:4193,budget:5958},{cat:'Landscaping',actual:1429,budget:1166},{cat:'Trash',actual:974,budget:1349},{cat:'Insurance',actual:623,budget:515},{cat:'Bank Fees',actual:257,budget:280},{cat:'Electric',actual:38,budget:39},{cat:'Prof Fees',actual:200,budget:71},{cat:'Violations',actual:486,budget:0}];
-
-const fmt=function(n){return n<0?'($'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})+')':'$'+n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})};
-const fmt2=function(n){return n<0?'($'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+')':'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
-
-function Card({children,title,subtitle,style,accent}){
-  return <div className="fade-in" style={Object.assign({background:'white',borderRadius:12,boxShadow:'0 2px 12px rgba(0,0,0,0.06)',overflow:'hidden'},style||{})}>
-    {accent&&<div style={{height:4,background:accent}}/>}
-    {title&&<div style={{padding:'16px 20px 8px'}}><h3 style={{fontSize:15,fontWeight:700,color:C.dark,margin:0}}>{title}</h3>{subtitle&&<p style={{fontSize:12,color:C.muted,margin:'2px 0 0'}}>{subtitle}</p>}</div>}
-    <div style={{padding:title?'0 20px 16px':'16px 20px'}}>{children}</div>
-  </div>;
-}
-function Metric({label,value,sub,color,icon}){
-  return <div className="fade-in" style={{background:'white',borderRadius:12,padding:'14px 16px',boxShadow:'0 2px 8px rgba(0,0,0,0.05)',borderLeft:'4px solid '+(color||C.primary)}}>
-    <div style={{fontSize:11,fontWeight:600,color:C.muted,textTransform:'uppercase',letterSpacing:'.5px'}}>{icon} {label}</div>
-    <div style={{fontSize:24,fontWeight:800,color:color||C.primary,margin:'4px 0'}}>{value}</div>
-    {sub&&<div style={{fontSize:11,color:C.muted}}>{sub}</div>}
-  </div>;
-}
-function Nav({label,active,onClick,icon}){
-  return <button onClick={onClick} style={{padding:'10px 18px',border:'none',borderBottom:active?'3px solid '+C.primary:'3px solid transparent',background:'none',cursor:'pointer',fontSize:13,fontWeight:active?700:400,color:active?C.primary:C.muted,display:'flex',alignItems:'center',gap:6}}><span>{icon}</span>{label}</button>;
-}
-function Inp({label,value,onChange,prefix,suffix,hint}){
-  return <div style={{marginBottom:10}}>
-    <div style={{display:'flex',alignItems:'center',gap:8}}>
-      <label style={{fontSize:12,fontWeight:600,color:'#555',minWidth:180}}>{label}</label>
-      <span style={{fontSize:12,color:'#999'}}>{prefix||'$'}</span>
-      <input type="number" value={value} onChange={function(e){onChange(Number(e.target.value))}} style={{width:95,padding:'5px 8px',border:'1px solid #ddd',borderRadius:6,fontSize:13,color:'#0000CC',fontWeight:600,outline:'none'}}/>
-      <span style={{fontSize:12,color:'#999'}}>{suffix||'/mo'}</span>
-    </div>
-    {hint&&<div style={{fontSize:11,color:'#aaa',marginLeft:188,marginTop:2}}>{hint}</div>}
-  </div>;
-}
-function CTip({active,payload,label}){
-  if(!active||!payload||!payload.length)return null;
-  return <div style={{background:'white',border:'1px solid #eee',borderRadius:8,padding:'8px 12px',boxShadow:'0 4px 12px rgba(0,0,0,.1)'}}>
-    <div style={{fontWeight:700,fontSize:12,marginBottom:4}}>{label}</div>
-    {payload.map(function(p,i){return <div key={i} style={{fontSize:12,color:p.color}}>{p.name}: {fmt(p.value)}</div>})}
-  </div>;
-}
-
-function Dashboard(){
-  const [tab,setTab]=useState('overview');
-  const [dues,setDues]=useState(CURRENT_DUES);
-  const [pm,setPm]=useState(525);
-  const [land,setLand]=useState(401);
-  const [trash,setTrash]=useState(487);
-  const [water,setWater]=useState(1490);
-  const [ins,setIns]=useState(69);
-  const [bank,setBank]=useState(93);
-  const [elec,setElec]=useState(13);
-  const [prof,setProf]=useState(24);
-  const [rep,setRep]=useState(83);
-  const [tax,setTax]=useState(2);
-  const [waterDebt,setWaterDebt]=useState(8000);
-  const [payoffMo,setPayoffMo]=useState(18);
-  const [savBank,setSavBank]=useState(65);
-  const [savLand,setSavLand]=useState(0);
-  const [savTrash,setSavTrash]=useState(0);
-  const [arRec,setArRec]=useState(1326);
-
-  var wPmt=payoffMo>0?waterDebt/payoffMo:0;
-  var tExp=pm+land+trash+water+ins+bank+elec+prof+rep+tax+wPmt;
-  var tInc=dues*UNITS;
-  var mNet=tInc-tExp;
-  var bEven=Math.ceil(tExp/UNITS);
-  var adjExp=tExp-savBank-savLand-savTrash;
-  var adjBE=Math.ceil(adjExp/UNITS);
-
-  var cats=[
-    {name:'Water (Current)',value:water,color:'#2E86AB'},{name:'Property Mgmt',value:pm,color:'#1F4E79'},
-    {name:'Trash/Recycling',value:trash,color:'#E67E22'},{name:'Landscaping',value:land,color:'#27AE60'},
-    {name:'Water Payoff',value:wPmt,color:'#C0392B'},{name:'Bank Fees',value:bank,color:'#BDC3C7'},
-    {name:'Repairs',value:rep,color:'#E74C3C'},{name:'Insurance',value:ins,color:'#8E44AD'},
-    {name:'Prof Fees',value:prof,color:'#1ABC9C'},{name:'Electric',value:elec,color:'#F39C12'},
-    {name:'Taxes',value:tax,color:'#7F8C8D'},
-  ].filter(function(c){return c.value>0}).sort(function(a,b){return b.value-a.value});
-
-  var pieD=cats.map(function(c){return{name:c.name,value:Math.round(c.value)}});
-  var perHH=cats.map(function(c){return{name:c.name,perHH:Math.round(c.value/UNITS*100)/100,color:c.color}});
-
-  var schedule=useMemo(function(){
-    var ms=['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
-    var bal=waterDebt;
-    return Array.from({length:payoffMo},function(_,i){
-      bal=Math.max(0,bal-wPmt);
-      return{month:ms[(i+3)%12]+' '+(2026+Math.floor((i+3)/12)),payment:wPmt,remaining:bal,totalW:water+wPmt};
-    });
-  },[waterDebt,payoffMo,wPmt,water]);
-
-  return <div style={{minHeight:'100vh',background:'#f0f2f5'}}>
-    <div style={{background:'linear-gradient(135deg,'+C.primary+','+C.accent+')',color:'white',padding:'24px 32px'}}>
-      <div style={{maxWidth:1200,margin:'0 auto'}}>
-        <h1 style={{fontSize:26,fontWeight:800,margin:0}}>Martin Court Property Owners Association</h1>
-        <h2 style={{fontSize:16,fontWeight:400,margin:'4px 0 0',opacity:.85}}>Financial Dashboard & Budget Planning Tool</h2>
-        <div style={{marginTop:8,fontSize:12,opacity:.7}}>Community Meeting — April 2026 | 16 Households | Cash Basis</div>
-      </div>
+    <div class="header">
+        <h1>Martin Court HOA - Financial Dashboard</h1>
+        <p>April 2026 | 16 Households</p>
     </div>
 
-    <div style={{background:'white',boxShadow:'0 2px 8px rgba(0,0,0,.06)',position:'sticky',top:0,zIndex:100}}>
-      <div style={{maxWidth:1200,margin:'0 auto',display:'flex',overflowX:'auto'}}>
-        <Nav label="Overview" icon="📊" active={tab==='overview'} onClick={function(){setTab('overview')}}/>
-        <Nav label="Your Dues" icon="💰" active={tab==='breakdown'} onClick={function(){setTab('breakdown')}}/>
-        <Nav label="Budget vs Actual" icon="📋" active={tab==='budget'} onClick={function(){setTab('budget')}}/>
-        <Nav label="What-If" icon="🔧" active={tab==='whatif'} onClick={function(){setTab('whatif')}}/>
-        <Nav label="Savings Plan" icon="✅" active={tab==='plan'} onClick={function(){setTab('plan')}}/>
-        <Nav label="Water Payoff" icon="💧" active={tab==='water'} onClick={function(){setTab('water')}}/>
-        <Nav label="Collections" icon="📨" active={tab==='collections'} onClick={function(){setTab('collections')}}/>
-      </div>
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('tab1')">📊 Financial Health</button>
+        <button class="nav-tab" onclick="switchTab('tab2')">🏦 Bank Transactions</button>
+        <button class="nav-tab" onclick="switchTab('tab3')">💰 Where Your Dues Go</button>
+        <button class="nav-tab" onclick="switchTab('tab4')">📋 Q1 2026 Budget Review</button>
+        <button class="nav-tab" onclick="switchTab('tab5')">✅ Proposed Solutions</button>
+        <button class="nav-tab" onclick="switchTab('tab6')">📝 Data Entry</button>
     </div>
 
-    <div style={{maxWidth:1200,margin:'0 auto',padding:'20px 16px'}}>
+    <div class="container">
+        <!-- TAB 1: FINANCIAL HEALTH -->
+        <div id="tab1" class="tab-content active">
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-label">Cash Available</div>
+                    <div class="metric-value">$6,935</div>
+                    <div class="metric-subtext">As of March 31, 2026</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Monthly Spending Gap</div>
+                    <div class="metric-value">-$721</div>
+                    <div class="metric-subtext">Avg deficit Q1 2026</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Unpaid Dues</div>
+                    <div class="metric-value">$1,326</div>
+                    <div class="metric-subtext">3 owners behind</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Water Balance Owed</div>
+                    <div class="metric-value">$7,486</div>
+                    <div class="metric-subtext">City of Houston</div>
+                </div>
+            </div>
 
-    {tab==='overview'&&<div>
-      <div className="fade-in" style={{background:'#FEF3CD',border:'1px solid #F0C000',borderRadius:10,padding:'14px 20px',marginBottom:20,display:'flex',alignItems:'center',gap:12}}>
-        <span style={{fontSize:24}}>⚠️</span>
-        <div><div style={{fontWeight:700,fontSize:14,color:C.dark}}>Financial Action Required</div>
-        <div style={{fontSize:13,color:'#666',marginTop:2}}>The HOA has been operating at a deficit since 2025. Total equity dropped from $15,313 to $3,735 in 15 months. This dashboard presents the full picture and a concrete plan to restore stability without a significant dues increase.</div></div>
-      </div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:12,marginBottom:20}}>
-        <Metric label="Cash in Bank" value={fmt(6935)} sub="As of March 31, 2026" color={C.warning} icon="🏦"/>
-        <Metric label="Net Assets" value={fmt(3735)} sub="Down from $15,313 end of 2024" color={C.danger} icon="📉"/>
-        <Metric label="2025 Net Loss" value={fmt(-9363)} sub="Expenses exceeded income" color={C.danger} icon="🔻"/>
-        <Metric label="Q1 2026 Net" value={fmt(-2215)} sub="3-month operating loss" color={C.danger} icon="📊"/>
-        <Metric label="Unpaid Dues" value={fmt(1326)} sub="3 owners past due" color={C.warning} icon="📨"/>
-      </div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:20}}>
-        <Card title="Income vs Expenses — Year Over Year" subtitle="2025 expense spike driven primarily by water costs" accent={C.primary}>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={plData} margin={{top:10,right:10,left:0,bottom:5}}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0"/>
-              <XAxis dataKey="year" fontSize={11}/><YAxis fontSize={11} tickFormatter={function(v){return '$'+(v/1000).toFixed(0)+'K'}}/>
-              <Tooltip content={<CTip/>}/><Legend wrapperStyle={{fontSize:12}}/>
-              <Bar dataKey="income" name="Income" fill={C.primary} radius={[4,4,0,0]}/>
-              <Bar dataKey="expenses" name="Expenses" fill={C.danger} radius={[4,4,0,0]}/>
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-        <Card title="Cash & Equity Trend" subtitle="Reserves peaked Dec 2024, declining since" accent={C.accent}>
-          <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={balData} margin={{top:10,right:10,left:0,bottom:5}}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0"/>
-              <XAxis dataKey="period" fontSize={11}/><YAxis fontSize={11} tickFormatter={function(v){return '$'+(v/1000).toFixed(0)+'K'}}/>
-              <Tooltip content={<CTip/>}/><Legend wrapperStyle={{fontSize:12}}/>
-              <Area dataKey="cash" name="Cash" fill={C.primary} fillOpacity={0.2} stroke={C.primary} strokeWidth={2}/>
-              <Area dataKey="equity" name="Equity" fill={C.success} fillOpacity={0.15} stroke={C.success} strokeWidth={2}/>
-            </AreaChart>
-          </ResponsiveContainer>
-        </Card>
-      </div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
-        <Card title="2025 Expense Distribution" subtitle="Water alone consumed 53% of all spending" accent={C.danger}>
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart><Pie data={exp2025} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={95} label={function(e){return e.name+' '+e.pct+'%'}} fontSize={11}>
-              {exp2025.map(function(_,i){return <Cell key={i} fill={PC[i]}/>})}</Pie><Tooltip formatter={function(v){return fmt(v)}}/></PieChart>
-          </ResponsiveContainer>
-        </Card>
-        <Card title="Q1 2026 Monthly" subtitle="March hit hardest by water catch-up" accent={C.warning}>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={mQ1} margin={{top:10,right:10,left:0,bottom:5}}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0"/>
-              <XAxis dataKey="month" fontSize={12}/><YAxis fontSize={11} tickFormatter={function(v){return fmt(v)}}/>
-              <Tooltip content={<CTip/>}/><Legend wrapperStyle={{fontSize:12}}/>
-              <Bar dataKey="income" name="Income" fill={C.primary} radius={[4,4,0,0]}/>
-              <Bar dataKey="expenses" name="Expenses" fill={C.warning} radius={[4,4,0,0]}/>
-            </BarChart>
-          </ResponsiveContainer>
-          <div style={{textAlign:'center',marginTop:8}}>{mQ1.map(function(m,i){return <span key={i} style={{display:'inline-block',margin:'0 12px',fontSize:12}}><strong>{m.month}:</strong> <span style={{color:m.net>=0?C.success:C.danger,fontWeight:700}}>{fmt(m.net)}</span></span>})}</div>
-        </Card>
-      </div>
-      <Card title="Key Findings" style={{marginTop:16}} accent={C.dark}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-          {[{i:'💧',t:'Water costs are the #1 driver',d:'$22,931 in 2025. Past-due balance with City of Houston being paid in installments. Current monthly usage ~$1,490.'},
-            {i:'📉',t:'Structural deficit ~$10K/year',d:'At $168/mo, dues generate ~$32K/yr but costs are ~$42K. Gap existed before water past-due issue.'},
-            {i:'🏦',t:'Cash reserves critically low',d:'$6,935 in bank with -$3,200 unfunded operating reserve. ~9 months of cash at current burn rate.'},
-            {i:'💳',t:'Bank fees are excessive',d:'Intuit charges $5.46 per ACH per dues payment. Switching to direct bank ACH saves $780+/year.'}
-          ].map(function(f,i){return <div key={i} style={{background:'#f8f9fa',borderRadius:8,padding:'12px 14px'}}>
-            <div style={{fontSize:14,fontWeight:700,marginBottom:4}}>{f.i} {f.t}</div>
-            <div style={{fontSize:12,color:'#666',lineHeight:1.5}}>{f.d}</div>
-          </div>})}
+            <div class="chart-card">
+                <div class="chart-title">Income vs Expenses by Month</div>
+                <div class="chart-container" id="incomeExpenseChart"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Cash Balance Over Time</div>
+                <div class="chart-container" id="cashTrendChart"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Where the Money Went in 2025</div>
+                <div class="chart-container" id="expensePieChart"></div>
+            </div>
+
+            <div class="section-title">Key Findings</div>
+
+            <div class="finding-card alert">
+                <div class="finding-title">Water Crisis</div>
+                <div class="finding-text">The community owes the City of Houston $7,486.25 for water charges. This is a critical issue that will continue to grow each month until addressed through either emergency assessment or significant conservation efforts.</div>
+            </div>
+
+            <div class="finding-card alert">
+                <div class="finding-title">Structural Monthly Deficit</div>
+                <div class="finding-text">Current monthly expenses ($2,925) exceed dues income ($2,352) by $573 per month. Without additional revenue or cost reductions, reserves will be depleted within 12 months.</div>
+            </div>
+
+            <div class="finding-card warning">
+                <div class="finding-title">Low Cash Reserves</div>
+                <div class="finding-text">Only $6,935 in available cash for a 16-household community. Industry standard is 6-12 months of operating expenses. Martin Court needs at least $17,550-$35,100 to weather unexpected costs.</div>
+            </div>
+
+            <div class="finding-card warning">
+                <div class="finding-title">Excessive Bank Fees</div>
+                <div class="finding-text">Annual fee burden of $2,555 ($13.30 per household per month) includes Intuit processing ($1,759) and bank charges ($796). These fees consume 7.9% of dues income.</div>
+            </div>
+
+            <div class="collections-section">
+                <div class="collections-title">Past-Due Accounts</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Owner</th>
+                            <th>Current</th>
+                            <th>1-30 Days</th>
+                            <th>31-60 Days</th>
+                            <th>61-90 Days</th>
+                            <th>&gt;90 Days</th>
+                            <th>Total Owed</th>
+                            <th>Penalties</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Owner A</strong></td>
+                            <td>$168</td>
+                            <td>$168</td>
+                            <td>$168</td>
+                            <td>$168</td>
+                            <td>$0</td>
+                            <td><strong>$672</strong></td>
+                            <td><span class="penalty-amount">$173</span></td>
+                            <td><span class="badge critical">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Owner B</strong></td>
+                            <td>$168</td>
+                            <td>$168</td>
+                            <td>$168</td>
+                            <td>$0</td>
+                            <td>$0</td>
+                            <td><strong>$504</strong></td>
+                            <td><span class="penalty-amount">$110</span></td>
+                            <td><span class="badge urgent">URGENT</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Owner C</strong></td>
+                            <td>$168</td>
+                            <td>$0</td>
+                            <td>$0</td>
+                            <td>$0</td>
+                            <td>$0</td>
+                            <td><strong>$168</strong></td>
+                            <td><span class="penalty-amount">$0</span></td>
+                            <td><span class="badge current">CURRENT</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 12px; color: #666; margin-top: 12px;">Penalties: $50/month late fee + 1.5% monthly interest on unpaid balance per HOA bylaws.</p>
+            </div>
         </div>
-      </Card>
-    </div>}
 
-    {tab==='breakdown'&&<div>
-      <Card title={'Where Every Dollar of Your $'+dues+' Goes'} subtitle={'Monthly cost per household: '+fmt2(tExp/UNITS)+' across '+cats.length+' categories'} accent={C.primary}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20,marginTop:8}}>
-          <div>{perHH.map(function(c,i){return <div key={i} style={{marginBottom:8}}>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:2}}><span style={{fontWeight:500}}>{c.name}</span><span><strong style={{color:c.color}}>{fmt2(c.perHH)}</strong> <span style={{color:'#aaa'}}>/HH</span></span></div>
-            <div style={{background:'#f0f0f0',borderRadius:4,height:20,overflow:'hidden'}}><div style={{width:Math.min(c.perHH/(tExp/UNITS)*100,100)+'%',background:c.color,height:'100%',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:4}}><span style={{fontSize:10,color:'white',fontWeight:600}}>{Math.round(c.perHH/(tExp/UNITS)*1000)/10}%</span></div></div>
-          </div>})}</div>
-          <div><ResponsiveContainer width="100%" height={300}><PieChart><Pie data={pieD} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={100} label={function(e){return e.name+' '+Math.round(e.percent*100)+'%'}} fontSize={11}>{pieD.map(function(_,i){return <Cell key={i} fill={cats[i]?cats[i].color:PC[i]}/>})}</Pie><Tooltip formatter={function(v){return fmt(v)+'/mo'}}/></PieChart></ResponsiveContainer></div>
+        <!-- TAB 2: BANK TRANSACTIONS -->
+        <div id="tab2" class="tab-content">
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-label">Total Deposits</div>
+                    <div class="metric-value">$85,894</div>
+                    <div class="metric-subtext">Mar 2023 - Apr 2026</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Withdrawals</div>
+                    <div class="metric-value">$78,887</div>
+                    <div class="metric-subtext">Mar 2023 - Apr 2026</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Number of Transactions</div>
+                    <div class="metric-value">575</div>
+                    <div class="metric-subtext">All account activity</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Intuit Fees Paid</div>
+                    <div class="metric-value">$1,759</div>
+                    <div class="metric-subtext">169 transactions</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Monthly Cash Flow</div>
+                <div class="chart-container" id="cashFlowChart"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Total Spending by Vendor</div>
+                <div class="chart-container" id="vendorChart"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="fee-callout">
+                    <div style="font-weight: 600; margin-bottom: 8px;">Fee Analysis</div>
+                    <div>Intuit processing fees: <span class="fee-amount">$1,759/year</span> (169 transactions = $10.41 average per batch)</div>
+                    <div style="margin-top: 6px;">Stellar Bank account analysis charges: <span class="fee-amount">$796/year</span> ($25.75/month)</div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #FFB84D; font-weight: 600;">Total annual fee burden: <span class="fee-amount">$2,555</span> = <span class="fee-amount">$13.30/month per household</span></div>
+                    <div style="margin-top: 6px; font-weight: 600;">That's 7.9% of every dues payment going to bank and processing fees.</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Transaction Details</div>
+                <div class="scrollable-table">
+                    <table class="transaction-table" id="transactionTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Vendor</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div style={{marginTop:16,background:'#f8f9fa',borderRadius:8,padding:14}}>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16,textAlign:'center'}}>
-            <div><div style={{fontSize:11,fontWeight:600,color:C.muted}}>COST PER HOUSEHOLD</div><div style={{fontSize:22,fontWeight:800,color:C.danger}}>{fmt2(tExp/UNITS)}</div></div>
-            <div><div style={{fontSize:11,fontWeight:600,color:C.muted}}>DUES COLLECTED</div><div style={{fontSize:22,fontWeight:800,color:C.primary}}>{fmt2(dues)}</div></div>
-            <div><div style={{fontSize:11,fontWeight:600,color:C.muted}}>MONTHLY GAP</div><div style={{fontSize:22,fontWeight:800,color:mNet>=0?C.success:C.danger}}>{fmt2(dues-tExp/UNITS)}</div></div>
-          </div>
+
+        <!-- TAB 3: WHERE YOUR DUES GO -->
+        <div id="tab3" class="tab-content">
+            <div class="section-title">How Your Monthly $168 is Spent</div>
+
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-label">Total Monthly Cost</div>
+                    <div class="metric-value">$225</div>
+                    <div class="metric-subtext">Current expenses per household</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Monthly Shortfall</div>
+                    <div class="metric-value">-$57</div>
+                    <div class="metric-subtext">Gap per household</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Highest Expense</div>
+                    <div class="metric-value">$93.13</div>
+                    <div class="metric-subtext">Water per household</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Fee Percentage</div>
+                    <div class="metric-value">7.9%</div>
+                    <div class="metric-subtext">Bank fees of dues</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="chart-card">
+                    <div class="chart-title">Spending by Category</div>
+                    <div class="horizontal-chart" id="duesBreakdownChart"></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">Percentage Breakdown</div>
+                    <div class="chart-container" id="duesPieChart"></div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Per-Household Breakdown</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Monthly Amount</th>
+                            <th>Per Household</th>
+                            <th>% of Dues</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Water (Current)</td>
+                            <td>$1,490</td>
+                            <td>$93.13</td>
+                            <td>55.4%</td>
+                        </tr>
+                        <tr>
+                            <td>Property Management</td>
+                            <td>$525</td>
+                            <td>$32.81</td>
+                            <td>19.5%</td>
+                        </tr>
+                        <tr>
+                            <td>Trash</td>
+                            <td>$487</td>
+                            <td>$30.44</td>
+                            <td>18.1%</td>
+                        </tr>
+                        <tr>
+                            <td>Landscaping</td>
+                            <td>$401</td>
+                            <td>$25.06</td>
+                            <td>14.9%</td>
+                        </tr>
+                        <tr>
+                            <td>Water Payoff Plan</td>
+                            <td>$416</td>
+                            <td>$26.00</td>
+                            <td>15.5%</td>
+                        </tr>
+                        <tr>
+                            <td>Bank/Processing Fees</td>
+                            <td>$93</td>
+                            <td>$5.81</td>
+                            <td>3.5%</td>
+                        </tr>
+                        <tr>
+                            <td>Insurance</td>
+                            <td>$69</td>
+                            <td>$4.31</td>
+                            <td>2.6%</td>
+                        </tr>
+                        <tr>
+                            <td>Repairs</td>
+                            <td>$83</td>
+                            <td>$5.19</td>
+                            <td>3.1%</td>
+                        </tr>
+                        <tr>
+                            <td>Professional Fees</td>
+                            <td>$24</td>
+                            <td>$1.50</td>
+                            <td>0.9%</td>
+                        </tr>
+                        <tr>
+                            <td>Electric</td>
+                            <td>$13</td>
+                            <td>$0.81</td>
+                            <td>0.5%</td>
+                        </tr>
+                        <tr>
+                            <td>Taxes</td>
+                            <td>$2</td>
+                            <td>$0.13</td>
+                            <td>0.1%</td>
+                        </tr>
+                        <tr style="font-weight: 700; background: #f0f0f0;">
+                            <td>TOTAL</td>
+                            <td>$3,603</td>
+                            <td>$225.19</td>
+                            <td>134%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="fee-callout">
+                <div style="font-weight: 600; margin-bottom: 8px;">Why is our total cost more than dues?</div>
+                <div>The community collects $168/month per household ($2,688 total) but current monthly expenses are $3,609. This $921 monthly gap is covered by reserves and the water payoff plan. The water debt balance is being paid down over time, which adds $26/household monthly. Combined, this creates a structural deficit that must be addressed through cost reduction, dues increase, or special assessment.</div>
+            </div>
         </div>
-        <div style={{marginTop:14,background:'#FFF8E1',border:'1px solid #FFE082',borderRadius:8,padding:12,fontSize:12}}><strong>What are "Bank & Processing Fees"?</strong> Stellar Bank Account Analysis Charge ($25.75/mo) + Intuit/QuickBooks ACH fees ($5.46 per transaction per dues payment). With 16 units, those per-transaction fees total ~$67/month.</div>
-      </Card>
-    </div>}
 
-    {tab==='budget'&&<div>
-      <Card title="Q1 2026 — Budget vs Actual" subtitle="January through March performance" accent={C.primary}>
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={bva} layout="vertical" margin={{top:5,right:20,left:100,bottom:5}}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0"/>
-            <XAxis type="number" fontSize={11} tickFormatter={function(v){return fmt(v)}}/>
-            <YAxis dataKey="cat" type="category" fontSize={11} width={95}/>
-            <Tooltip content={<CTip/>}/><Legend wrapperStyle={{fontSize:12}}/>
-            <Bar dataKey="actual" name="Actual" fill={C.primary} radius={[0,4,4,0]}/>
-            <Bar dataKey="budget" name="Budget" fill={C.muted} radius={[0,4,4,0]}/>
-          </BarChart>
-        </ResponsiveContainer>
-        <table style={{width:'100%',borderCollapse:'collapse',marginTop:16,fontSize:12}}>
-          <thead><tr style={{background:C.primary,color:'white'}}><th style={{padding:'8px 10px',textAlign:'left'}}>Category</th><th style={{padding:'8px 10px',textAlign:'right'}}>Actual</th><th style={{padding:'8px 10px',textAlign:'right'}}>Budget</th><th style={{padding:'8px 10px',textAlign:'right'}}>Variance</th><th style={{padding:'8px 10px',textAlign:'right'}}>Status</th></tr></thead>
-          <tbody>{bva.map(function(r,i){var v=r.actual-r.budget;var isI=r.cat.indexOf('Income')>=0;var bad=isI?(v<0):(v>100);return <tr key={i} style={{background:i%2===0?'#f8f9fa':'white'}}>
-            <td style={{padding:'7px 10px',fontWeight:500}}>{r.cat}</td><td style={{padding:'7px 10px',textAlign:'right'}}>{fmt(r.actual)}</td><td style={{padding:'7px 10px',textAlign:'right',color:C.muted}}>{fmt(r.budget)}</td>
-            <td style={{padding:'7px 10px',textAlign:'right',color:bad?C.danger:C.success,fontWeight:600}}>{(v>=0?'+':'')+fmt(v)}</td>
-            <td style={{padding:'7px 10px',textAlign:'right'}}><span style={{background:bad?'#FFC7CE':'#C6EFCE',color:bad?C.danger:C.success,padding:'2px 8px',borderRadius:10,fontSize:11,fontWeight:600}}>{bad?'Over':'OK'}</span></td>
-          </tr>})}</tbody>
-        </table>
-        <div style={{marginTop:12,fontSize:12,color:'#888',lineHeight:1.6}}><strong>Notes:</strong> Jan trash drafted Dec 2025. Feb water = current billing. Mar began past-due catch-up. Prof fee is annual charge. Violation fees billed late March — revenue in Q2.</div>
-      </Card>
-    </div>}
+        <!-- TAB 4: Q1 2026 BUDGET REVIEW -->
+        <div id="tab4" class="tab-content">
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-label">Total Q1 Income</div>
+                    <div class="metric-value">$7,560</div>
+                    <div class="metric-subtext">Dues collected</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Q1 Expenses</div>
+                    <div class="metric-value">$9,589</div>
+                    <div class="metric-subtext">All categories</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Q1 Variance</div>
+                    <div class="metric-value">-$2,029</div>
+                    <div class="metric-subtext">Under budget expectations</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Budget vs Actual</div>
+                    <div class="metric-value">-26.7%</div>
+                    <div class="metric-subtext">Total variance</div>
+                </div>
+            </div>
 
-    {tab==='whatif'&&<div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
-        <Metric label="Monthly Income" value={fmt(tInc)} sub={UNITS+' x $'+dues} color={C.primary} icon="📈"/>
-        <Metric label="Monthly Expenses" value={fmt(Math.round(tExp))} sub={'Break-even: $'+bEven+'/HH'} color={C.danger} icon="📉"/>
-      </div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
-        <Card title="Adjust Dues" accent={C.primary}><div style={{marginTop:8}}>
-          <div style={{display:'flex',alignItems:'center',gap:12}}><input type="range" min={150} max={260} value={dues} onChange={function(e){setDues(Number(e.target.value))}} style={{flex:1}}/><span style={{fontSize:28,fontWeight:800,color:'#0000CC'}}>{'$'+dues}</span></div>
-          <div style={{fontSize:12,color:C.muted,marginTop:4}}>{dues===CURRENT_DUES?'No change':<span style={{color:dues>CURRENT_DUES?C.success:C.danger}}>{(dues>CURRENT_DUES?'+':'')+(dues-CURRENT_DUES)+'/mo ($'+(dues-CURRENT_DUES)*12+'/yr per HH)'}</span>}</div>
-        </div></Card>
-        <Card title="Impact" accent={mNet>=0?C.success:C.danger}><div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,textAlign:'center',marginTop:8}}>
-          <div><div style={{fontSize:10,color:C.muted}}>ANNUAL INCOME</div><div style={{fontSize:18,fontWeight:700,color:C.primary}}>{fmt(tInc*12)}</div></div>
-          <div><div style={{fontSize:10,color:C.muted}}>ANNUAL EXPENSES</div><div style={{fontSize:18,fontWeight:700,color:C.warning}}>{fmt(Math.round(tExp*12))}</div></div>
-          <div><div style={{fontSize:10,color:C.muted}}>ANNUAL NET</div><div style={{fontSize:22,fontWeight:800,color:mNet*12>=0?C.success:C.danger}}>{fmt(Math.round(mNet*12))}</div></div>
-        </div></Card>
-      </div>
-      <Card title="Adjust Expenses" subtitle="Edit any line item" style={{marginTop:16}} accent={C.warning}><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:8}}>
-        <div><Inp label="Property Mgmt" value={pm} onChange={setPm} hint="LLA Partners — $525/mo"/><Inp label="Landscaping" value={land} onChange={setLand} hint="Saint Clair — ~$401/mo"/><Inp label="Trash" value={trash} onChange={setTrash} hint="Texas Pride — ~$487/mo"/><Inp label="Water (Current)" value={water} onChange={setWater} hint="City of Houston — ~$1,490/mo"/><Inp label="Insurance" value={ins} onChange={setIns} hint="Annual $824 / 12"/></div>
-        <div><Inp label="Bank & Processing" value={bank} onChange={setBank} hint="Stellar $26 + Intuit ~$67/mo"/><Inp label="Electric" value={elec} onChange={setElec} hint="NRG — ~$13/mo"/><Inp label="Prof Fees" value={prof} onChange={setProf} hint="~$24/mo avg"/><Inp label="Repairs" value={rep} onChange={setRep} hint="~$83/mo budget"/><Inp label="Water Payoff" value={Math.round(wPmt)} onChange={function(){}} hint={'Edit in Water Payoff tab'}/></div>
-      </div></Card>
-    </div>}
+            <div class="chart-card">
+                <div class="chart-title">Q1 Budget vs Actual</div>
+                <div class="chart-container" id="budgetChart"></div>
+            </div>
 
-    {tab==='plan'&&<div>
-      <div className="fade-in" style={{background:'linear-gradient(135deg,#E8F5E9,#C8E6C9)',borderRadius:12,padding:'16px 20px',marginBottom:20}}>
-        <div style={{fontSize:16,fontWeight:700,color:C.dark}}>Strategy: Minimize Dues Increase Through Cost Optimization</div>
-        <div style={{fontSize:13,color:'#555',marginTop:4}}>Pursue savings on fees, vendors, and collections before raising dues.</div>
-      </div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
-        <Card title="Savings Levers" accent={C.success}><div style={{marginTop:8}}>
-          <Inp label="Bank fee savings" value={savBank} onChange={setSavBank} suffix="/mo" hint="Direct ACH eliminates Intuit (~$65/mo)"/>
-          <Inp label="Landscaping savings" value={savLand} onChange={setSavLand} suffix="/mo" hint="Rebid — 10-20% ($40-80/mo)"/>
-          <Inp label="Trash savings" value={savTrash} onChange={setSavTrash} suffix="/mo" hint="Shop competitors — 5-15%"/>
-          <Inp label="AR Recovery" value={arRec} onChange={setArRec} suffix=" total" hint="$1,326 outstanding"/>
-          <div style={{marginTop:12,background:'#E8F5E9',borderRadius:8,padding:10,fontSize:13}}><strong>Monthly Savings: </strong><span style={{color:C.success,fontWeight:700,fontSize:16}}>{fmt(savBank+savLand+savTrash)}/mo</span> <span style={{color:'#888'}}>({fmt((savBank+savLand+savTrash)*12)}/yr)</span></div>
-        </div></Card>
-        <div style={{display:'grid',gridTemplateRows:'1fr 1fr',gap:16}}>
-          <Card accent={C.danger}><div style={{textAlign:'center'}}><div style={{fontSize:11,fontWeight:700,color:C.danger,textTransform:'uppercase'}}>Without Savings</div><div style={{fontSize:28,fontWeight:800,color:C.danger,margin:'8px 0'}}>{'$'+bEven+'/mo'}</div><div style={{fontSize:13}}>Increase: <strong>{'+$'+(bEven-CURRENT_DUES)+'/mo'}</strong></div><div style={{fontSize:12,color:C.muted}}>{'+$'+(bEven-CURRENT_DUES)*12+'/yr per HH'}</div></div></Card>
-          <Card accent={C.success}><div style={{textAlign:'center'}}><div style={{fontSize:11,fontWeight:700,color:C.success,textTransform:'uppercase'}}>With Savings</div><div style={{fontSize:28,fontWeight:800,color:C.success,margin:'8px 0'}}>{'$'+adjBE+'/mo'}</div><div style={{fontSize:13}}>Increase: <strong style={{color:adjBE>CURRENT_DUES?C.warning:C.success}}>{adjBE>CURRENT_DUES?'+$'+(adjBE-CURRENT_DUES)+'/mo':'None!'}</strong></div><div style={{fontSize:12,color:C.muted}}>{adjBE>CURRENT_DUES?'+$'+(adjBE-CURRENT_DUES)*12+'/yr per HH':'Savings cover gap'}</div></div></Card>
+            <div class="chart-card">
+                <div class="chart-title">Category Analysis</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Q1 Budget</th>
+                            <th>Q1 Actual</th>
+                            <th>Variance</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>HOA Dues</td>
+                            <td>$8,064</td>
+                            <td>$7,560</td>
+                            <td>-$504</td>
+                            <td><span class="status-badge status-under">Under</span></td>
+                        </tr>
+                        <tr>
+                            <td>Bank Fees</td>
+                            <td>$280</td>
+                            <td>$257</td>
+                            <td>-$23</td>
+                            <td><span class="status-badge status-under">Under</span></td>
+                        </tr>
+                        <tr>
+                            <td>Insurance</td>
+                            <td>$515</td>
+                            <td>$623</td>
+                            <td>+$108</td>
+                            <td><span class="status-badge status-over">Over</span></td>
+                        </tr>
+                        <tr>
+                            <td>Landscaping</td>
+                            <td>$1,166</td>
+                            <td>$1,429</td>
+                            <td>+$263</td>
+                            <td><span class="status-badge status-over">Over</span></td>
+                        </tr>
+                        <tr>
+                            <td>Professional Fees</td>
+                            <td>$71</td>
+                            <td>$200</td>
+                            <td>+$129</td>
+                            <td><span class="status-badge status-over">Over</span></td>
+                        </tr>
+                        <tr>
+                            <td>Property Mgmt</td>
+                            <td>$1,575</td>
+                            <td>$1,575</td>
+                            <td>$0</td>
+                            <td><span class="status-badge status-ontrack">On Track</span></td>
+                        </tr>
+                        <tr>
+                            <td>Repairs</td>
+                            <td>$250</td>
+                            <td>$0</td>
+                            <td>-$250</td>
+                            <td><span class="status-badge status-under">Under</span></td>
+                        </tr>
+                        <tr>
+                            <td>Taxes</td>
+                            <td>$4</td>
+                            <td>$0</td>
+                            <td>-$4</td>
+                            <td><span class="status-badge status-under">Under</span></td>
+                        </tr>
+                        <tr>
+                            <td>Trash</td>
+                            <td>$1,349</td>
+                            <td>$974</td>
+                            <td>-$375</td>
+                            <td><span class="status-badge status-under">Under</span></td>
+                        </tr>
+                        <tr>
+                            <td>Electric</td>
+                            <td>$39</td>
+                            <td>$38</td>
+                            <td>-$1</td>
+                            <td><span class="status-badge status-under">Under</span></td>
+                        </tr>
+                        <tr>
+                            <td>Water</td>
+                            <td>$5,959</td>
+                            <td>$4,193</td>
+                            <td>-$1,766</td>
+                            <td><span class="status-badge status-under">Under</span></td>
+                        </tr>
+                        <tr>
+                            <td>Violations</td>
+                            <td>$0</td>
+                            <td>$486</td>
+                            <td>+$486</td>
+                            <td><span class="status-badge status-over">Over</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="metric-card" style="margin-top: 24px;">
+                <div class="chart-title">Notes on Variance</div>
+                <ul>
+                    <li><strong>Dues Under Budget:</strong> 3 owners behind on payments explains $504 shortfall.</li>
+                    <li><strong>Water Under Budget:</strong> Despite payoff plan, actual consumption lower than projected ($4,193 vs $5,959). This is positive but timing may reflect delayed billing.</li>
+                    <li><strong>Landscaping Over:</strong> One-time spring maintenance boosted costs by $263.</li>
+                    <li><strong>Professional Fees:</strong> Bookkeeping costs higher than annual average.</li>
+                    <li><strong>Violations Charged:</strong> Unexpected $486 in violation enforcement fees.</li>
+                    <li><strong>Trash Savings:</strong> Possible billing adjustment or usage reduction.</li>
+                </ul>
+            </div>
         </div>
-      </div>
-      <Card title="Phased Action Plan" accent={C.primary}><div style={{marginTop:8}}>
-        {[{p:'Phase 1 — Immediate',items:['Switch to direct bank ACH — eliminate Intuit fees','Send formal demand letters to 3 delinquent owners ($1,326)','Request City of Houston water meter audit','Review irrigation schedule'],c:C.danger},
-          {p:'Phase 2 — 30-60 Days',items:['Get 2-3 bids for landscaping','Get 2-3 bids for trash/recycling','Negotiate Stellar Bank fees','Monthly financial review at board meetings'],c:C.warning},
-          {p:'Phase 3 — Q3 Vote',items:['Modest dues adjustment to $'+Math.min(adjBE+13,198)+'/mo ($'+(Math.min(adjBE+13,198)-168)+' increase)','Establish operating reserve fund','Annual budget review process','Continue water installment plan'],c:C.success}
-        ].map(function(p,pi){return <div key={pi} style={{marginBottom:14}}>
-          <div style={{fontWeight:700,fontSize:13,color:p.c,marginBottom:6,display:'flex',alignItems:'center',gap:8}}><div style={{width:8,height:8,borderRadius:'50%',background:p.c}}/>{p.p}</div>
-          <div style={{marginLeft:16}}>{p.items.map(function(it,ii){return <div key={ii} style={{fontSize:12,color:'#555',padding:'3px 0'}}><span style={{color:p.c}}>• </span>{it}</div>})}</div>
-        </div>})}
-      </div></Card>
-    </div>}
 
-    {tab==='water'&&<div>
-      <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:16,marginBottom:16}}>
-        <Card title="Water Past-Due — Installment Plan" subtitle="Enter actual balance, choose timeline" accent="#2E86AB"><div style={{marginTop:8}}>
-          <Inp label="Past-Due Balance" value={waterDebt} onChange={setWaterDebt} prefix="$" suffix=" owed" hint="Enter actual City of Houston amount"/>
-          <div style={{marginTop:12}}><label style={{fontSize:12,fontWeight:600,color:'#555'}}>Payoff Timeline</label>
-            <div style={{display:'flex',gap:8,marginTop:6}}>{[6,12,18,24,36].map(function(m){return <button key={m} onClick={function(){setPayoffMo(m)}} style={{padding:'8px 16px',borderRadius:8,border:payoffMo===m?'2px solid '+C.primary:'1px solid #ddd',background:payoffMo===m?'#D6E4F0':'white',fontWeight:payoffMo===m?700:400,cursor:'pointer',fontSize:13}}>{m} mo</button>})}</div>
-          </div>
-        </div></Card>
-        <div style={{display:'grid',gridTemplateRows:'1fr 1fr 1fr',gap:12}}>
-          <Metric label="Total Past-Due" value={fmt(waterDebt)} color={C.primary} icon="💧"/>
-          <Metric label="Monthly Payment" value={fmt2(wPmt)} sub="Added to water bill" color={C.warning} icon="📆"/>
-          <Metric label="Per Household/Mo" value={fmt2(wPmt/UNITS)} sub="Temporary" color={C.danger} icon="🏠"/>
-        </div>
-      </div>
-      <Card title="Payment Schedule" accent={C.primary}>
-        <div style={{maxHeight:320,overflowY:'auto',borderRadius:8,border:'1px solid #eee'}}>
-          <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
-            <thead><tr style={{background:C.primary,color:'white',position:'sticky',top:0}}><th style={{padding:'8px 10px',textAlign:'left'}}>Month</th><th style={{padding:'8px 10px',textAlign:'right'}}>Payment</th><th style={{padding:'8px 10px',textAlign:'right'}}>Remaining</th><th style={{padding:'8px 10px',textAlign:'right'}}>Current Water</th><th style={{padding:'8px 10px',textAlign:'right'}}>Total</th></tr></thead>
-            <tbody>{schedule.map(function(r,i){return <tr key={i} style={{background:i%2===0?'#f8f9fa':'white'}}>
-              <td style={{padding:'6px 10px',fontWeight:500}}>{r.month}</td>
-              <td style={{padding:'6px 10px',textAlign:'right'}}>{fmt2(r.payment)}</td>
-              <td style={{padding:'6px 10px',textAlign:'right',color:r.remaining>0?C.danger:C.success,fontWeight:r.remaining<1?700:400}}>{r.remaining<1?'✅ PAID OFF':fmt(Math.round(r.remaining))}</td>
-              <td style={{padding:'6px 10px',textAlign:'right',color:C.muted}}>{fmt(water)}</td>
-              <td style={{padding:'6px 10px',textAlign:'right',fontWeight:600}}>{fmt(Math.round(r.totalW))}</td>
-            </tr>})}</tbody>
-          </table>
-        </div>
-        <div style={{marginTop:12,background:'#E8F5E9',borderRadius:8,padding:12,fontSize:13}}><strong>After payoff ({payoffMo} months):</strong> Water drops from {fmt(Math.round(water+wPmt))} to {fmt(water)}/mo, freeing {fmt(Math.round(wPmt))}/mo ({fmt2(wPmt/UNITS)}/HH).</div>
-      </Card>
-    </div>}
+        <!-- TAB 5: PROPOSED SOLUTIONS -->
+        <div id="tab5" class="tab-content">
+            <div class="section-title">Cost Savings Opportunities</div>
 
-    {tab==='collections'&&<div>
-      <Card title="Accounts Receivable — March 31, 2026" subtitle="3 owners owe $1,326 combined" accent={C.warning}>
-        <table style={{width:'100%',borderCollapse:'collapse',marginTop:8,fontSize:12}}>
-          <thead><tr style={{background:C.primary,color:'white'}}><th style={{padding:'8px 10px',textAlign:'left'}}>Owner</th><th style={{padding:'8px 10px',textAlign:'right'}}>Current</th><th style={{padding:'8px 10px',textAlign:'right'}}>1-30</th><th style={{padding:'8px 10px',textAlign:'right'}}>31-60</th><th style={{padding:'8px 10px',textAlign:'right'}}>61-90</th><th style={{padding:'8px 10px',textAlign:'right'}}>&gt;90</th><th style={{padding:'8px 10px',textAlign:'right'}}>TOTAL</th></tr></thead>
-          <tbody>
-            {arRows.map(function(r,i){return <tr key={i} style={{background:r.total>500?'#FFF3F3':i%2===0?'#f8f9fa':'white'}}>
-              <td style={{padding:'8px 10px',fontWeight:600}}>{r.owner}{r.total>500&&<span style={{background:C.danger,color:'white',padding:'1px 6px',borderRadius:8,fontSize:10,marginLeft:4}}>HIGH</span>}</td>
-              <td style={{padding:'8px 10px',textAlign:'right'}}>{fmt(r.current)}</td>
-              <td style={{padding:'8px 10px',textAlign:'right'}}>{r.d30?fmt(r.d30):'-'}</td>
-              <td style={{padding:'8px 10px',textAlign:'right'}}>{r.d60?fmt(r.d60):'-'}</td>
-              <td style={{padding:'8px 10px',textAlign:'right',color:r.d90?C.danger:'inherit',fontWeight:r.d90?700:400}}>{r.d90?fmt(r.d90):'-'}</td>
-              <td style={{padding:'8px 10px',textAlign:'right'}}>{r.over90?fmt(r.over90):'-'}</td>
-              <td style={{padding:'8px 10px',textAlign:'right',fontWeight:700,color:r.total>500?C.danger:C.dark}}>{fmt(r.total)}</td>
-            </tr>})}
-            <tr style={{background:C.dark,color:'white',fontWeight:700}}><td style={{padding:'8px 10px'}}>TOTAL</td><td style={{padding:'8px 10px',textAlign:'right'}}>{fmt(486)}</td><td style={{padding:'8px 10px',textAlign:'right'}}>{fmt(336)}</td><td style={{padding:'8px 10px',textAlign:'right'}}>{fmt(336)}</td><td style={{padding:'8px 10px',textAlign:'right'}}>{fmt(168)}</td><td style={{padding:'8px 10px',textAlign:'right'}}>-</td><td style={{padding:'8px 10px',textAlign:'right',fontSize:14}}>{fmt(1326)}</td></tr>
-          </tbody>
-        </table>
-        <div style={{marginTop:16,display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
-          {arRows.map(function(r,i){return <div key={i} style={{background:r.total>500?'#FFF3F3':'#f8f9fa',border:'1px solid '+(r.total>500?'#FFCDD2':'#e0e0e0'),borderRadius:8,padding:12}}>
-            <div style={{fontWeight:700,fontSize:13}}>{r.owner}</div>
-            <div style={{fontSize:22,fontWeight:800,color:r.total>500?C.danger:C.warning,margin:'4px 0'}}>{fmt(r.total)}</div>
-            <div style={{fontSize:11,color:C.muted}}>{r.d90>0?'90 days — '+Math.ceil(r.total/168)+' months behind':r.d60>0?'60 days — '+Math.ceil(r.total/168)+' months behind':'Current only'}</div>
-            <div style={{marginTop:8,fontSize:11,fontWeight:600,color:r.total>500?C.danger:C.success}}>{r.total>500?'Action: Demand letter + lien':r.total>300?'Action: Demand letter':'Action: Reminder'}</div>
-          </div>})}
-        </div>
-      </Card>
-    </div>}
+            <div class="savings-card">
+                <div class="finding-title">1. Reduce Intuit Processing Fees</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Current annual cost: <span class="currency">$1,759</span> (169 transactions)</div>
+                <div class="savings-amount">Save $780/year ($65/month)</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Recommended action: Set up ACH direct debit through Stellar Bank to collect dues directly. This eliminates individual Intuit charges while reducing payment friction.</div>
+            </div>
 
-    <div style={{marginTop:24,padding:'14px 20px',background:'white',borderRadius:12,textAlign:'center',fontSize:12,color:C.muted}}>Martin Court Property Owners Association Inc | Community Meeting April 2026 | All inputs editable</div>
+            <div class="savings-card">
+                <div class="finding-title">2. Negotiate Stellar Bank Account Fees</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Current annual cost: <span class="currency">$796</span> ($25.75/month)</div>
+                <div class="savings-amount">Save $400-796/year ($33-66/month)</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Recommended action: Many banks offer free or low-cost HOA accounts. Get quotes from Credit Union or online banks (Mercury, Brex, Stripe). Even negotiating with Stellar could cut charges 50%.</div>
+            </div>
+
+            <div class="savings-card">
+                <div class="finding-title">3. Review Landscaping Contract (Saint Clair & Sons)</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Current annual cost: <span class="currency">$4,806</span> ($401/month)</div>
+                <div class="savings-amount">Save $500-1,000/year ($42-83/month)</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Recommended action: Industry benchmark for 16-unit HOA is $300-450/month. Request competitive bids from 2-3 vendors. Consider reducing frequency or scope (e.g., every other week instead of weekly).</div>
+            </div>
+
+            <div class="savings-card">
+                <div class="finding-title">4. Renegotiate Trash Service (Texas Pride)</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Current annual cost: <span class="currency">$5,843</span> ($487/month)</div>
+                <div class="savings-amount">Save $400-800/year ($33-67/month)</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Recommended action: Get competitive quotes from Republic Services and Waste Management. Volume discounts may be available, or consolidation with recycling/yard waste services.</div>
+            </div>
+
+            <div class="savings-card">
+                <div class="finding-title">5. Right-Size Property Management</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Current annual cost: <span class="currency">$6,300</span> ($525/month) = 19.7% of dues income</div>
+                <div class="savings-amount">Save $1,000-2,000/year ($83-167/month)</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Recommended action: Industry benchmark is 8-12% of dues. Review scope with LLA Property Partners. Can any functions be self-managed? Can scope be reduced to collections, compliance, maintenance coordination only?</div>
+            </div>
+
+            <div class="savings-card">
+                <div class="finding-title">6. Address Water Usage Crisis</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Current annual cost: <span class="currency">$17,880</span> ($1,490/month) + $7,486 balance owed</div>
+                <div class="savings-amount">Save $3,000-6,000/year ($250-500/month)</div>
+                <div style="font-size: 13px; color: #666; margin: 8px 0;">Recommended action: Request meter audit from City of Houston for leaks. Review irrigation schedule. Consider smart irrigation controller. High usage suggests leak or billing error.</div>
+            </div>
+
+            <div class="section-title" style="margin-top: 40px;">What-If Scenario Planner</div>
+
+            <div class="data-section">
+                <div class="form-group">
+                    <div class="form-label">Monthly Dues per Household</div>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="duesSlider" min="150" max="260" value="168" onchange="updateScenario()">
+                        <div class="slider-value">$<span id="duesValue">168</span>/month</div>
+                        <div class="quick-buttons">
+                            <button class="quick-btn" onclick="setDuesAmount(150)">$150</button>
+                            <button class="quick-btn active" onclick="setDuesAmount(168)">$168</button>
+                            <button class="quick-btn" onclick="setDuesAmount(200)">$200</button>
+                            <button class="quick-btn" onclick="setDuesAmount(230)">$230</button>
+                            <button class="quick-btn" onclick="setDuesAmount(260)">$260</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toggle-checkbox">
+                    <input type="checkbox" id="specialAssessmentToggle" onchange="updateScenario()">
+                    <label for="specialAssessmentToggle" style="margin: 0; cursor: pointer; font-weight: 500;">Include one-time water payoff special assessment</label>
+                </div>
+
+                <div id="assessmentInfo" class="metric-card hidden">
+                    <div class="metric-label">Special Assessment for Water Balance</div>
+                    <div class="metric-value">$468</div>
+                    <div class="metric-subtext">One-time per household to clear $7,486 balance</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">Water ($/month)</label>
+                        <input type="number" id="scenarioWater" value="1490" onchange="updateScenario()" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Property Mgmt ($/month)</label>
+                        <input type="number" id="scenarioPropMgmt" value="525" onchange="updateScenario()" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Trash ($/month)</label>
+                        <input type="number" id="scenarioTrash" value="487" onchange="updateScenario()" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Landscaping ($/month)</label>
+                        <input type="number" id="scenarioLandscape" value="401" onchange="updateScenario()" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bank Fees ($/month)</label>
+                        <input type="number" id="scenarioFees" value="93" onchange="updateScenario()" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Other Expenses ($/month)</label>
+                        <input type="number" id="scenarioOther" value="189" onchange="updateScenario()" style="text-align: right;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="comparison-label">Annual Dues Income</div>
+                    <div class="comparison-value" id="scenarioIncome">$32,256</div>
+                </div>
+                <div class="comparison-card">
+                    <div class="comparison-label">Annual Expenses</div>
+                    <div class="comparison-value" id="scenarioExpenses">$38,160</div>
+                </div>
+                <div class="comparison-card">
+                    <div class="comparison-label">Annual Net (Deficit)</div>
+                    <div class="comparison-value" id="scenarioNet" style="color: #E74C3C;">-$5,904</div>
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top: 40px;">Water Payoff Plan</div>
+
+            <div class="data-section">
+                <div class="form-group">
+                    <label class="form-label">Water Balance Owed</label>
+                    <input type="number" id="waterBalance" value="7486.25" onchange="updateWaterPlan()" style="text-align: right;">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Payoff Period (Months)</label>
+                    <div class="quick-buttons">
+                        <button class="quick-btn" onclick="setWaterMonths(6)">6 months</button>
+                        <button class="quick-btn active" onclick="setWaterMonths(18)">18 months</button>
+                        <button class="quick-btn" onclick="setWaterMonths(24)">24 months</button>
+                        <button class="quick-btn" onclick="setWaterMonths(36)">36 months</button>
+                    </div>
+                    <input type="number" id="waterMonths" value="18" onchange="updateWaterPlan()" min="1" max="60" style="width: 100px; margin-top: 8px; text-align: right;">
+                </div>
+            </div>
+
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-label">Monthly Payment</div>
+                    <div class="metric-value" id="waterMonthlyPayment">$416</div>
+                    <div class="metric-subtext">To clear balance in 18 months</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Per Household</div>
+                    <div class="metric-value" id="waterPerHousehold">$26</div>
+                    <div class="metric-subtext">Monthly payment per unit</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Payoff Date</div>
+                    <div class="metric-value" id="waterPayoffDate">Oct 2027</div>
+                    <div class="metric-subtext">When balance reaches zero</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Water Balance Payoff Schedule</div>
+                <table class="payment-schedule" id="waterScheduleTable">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Payment</th>
+                            <th>Remaining Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="waterScheduleBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="metric-card" style="margin-top: 24px; border-left: 4px solid #27AE60;">
+                <div class="finding-title">Post-Payoff Benefit</div>
+                <div style="font-size: 13px; color: #666; line-height: 1.6;">
+                    Once water balance is cleared in 18 months, monthly water costs drop significantly and the community can redirect that $416/month ($26 per household) to reserves, infrastructure improvements, or reducing dues. This is why addressing the water issue urgently is critical — it frees up cash flow for other priorities.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: DATA ENTRY -->
+        <div id="tab6" class="tab-content">
+            <div class="section-title">Monthly Financial Data</div>
+
+            <div class="data-section">
+                <div class="month-selector">
+                    <input type="month" id="dataMonth" value="2026-03" onchange="loadMonthData()">
+                    <button onclick="saveCurrentMonth()">Save Month Data</button>
+                    <button class="secondary" onclick="addNewMonth()">Add New Month</button>
+                </div>
+
+                <div class="section-title" style="margin-top: 24px; margin-bottom: 16px; font-size: 16px;">Income & Expenses</div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">HOA Dues Income</label>
+                        <input type="number" id="field_dues" value="2520" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Water Expense</label>
+                        <input type="number" id="field_water" value="2704.41" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Property Mgmt</label>
+                        <input type="number" id="field_propmgmt" value="525" step="0.01" style="text-align: right;">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Trash</label>
+                        <input type="number" id="field_trash" value="486.87" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Landscaping</label>
+                        <input type="number" id="field_landscape" value="627.86" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Insurance</label>
+                        <input type="number" id="field_insurance" value="0" step="0.01" style="text-align: right;">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Bank Fees</label>
+                        <input type="number" id="field_bankfees" value="85.81" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Repairs</label>
+                        <input type="number" id="field_repairs" value="0" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Professional Fees</label>
+                        <input type="number" id="field_profees" value="200" step="0.01" style="text-align: right;">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Electric</label>
+                        <input type="number" id="field_electric" value="12.54" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Taxes</label>
+                        <input type="number" id="field_taxes" value="0" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Violations</label>
+                        <input type="number" id="field_violations" value="486" step="0.01" style="text-align: right;">
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top: 24px; margin-bottom: 16px; font-size: 16px;">Balance Sheet (End of Month)</div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Cash in Bank</label>
+                        <input type="number" id="field_cash" value="6935.28" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unpaid Dues (AR)</label>
+                        <input type="number" id="field_ar" value="1344" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Emergency Fund Reserve</label>
+                        <input type="number" id="field_reserve" value="-3200" step="0.01" style="text-align: right;">
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top: 24px; margin-bottom: 16px; font-size: 16px;">Accounts Receivable Aging</div>
+
+                <table style="width: 100%; margin-bottom: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Owner</th>
+                            <th>Current Month</th>
+                            <th>1-30 Days Late</th>
+                            <th>31-60 Days Late</th>
+                            <th>61-90 Days Late</th>
+                            <th>&gt;90 Days Late</th>
+                            <th style="text-align: right;">Total Owed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="arTable">
+                    </tbody>
+                </table>
+
+                <button class="add-owner-btn" onclick="addAROwner()">+ Add Owner</button>
+
+                <div class="section-title" style="margin-top: 24px; margin-bottom: 16px; font-size: 16px;">Annual Budget (Reference)</div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Annual Dues Budget</label>
+                        <input type="number" id="budget_dues" value="32256" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Annual Water Budget</label>
+                        <input type="number" id="budget_water" value="23836" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Annual Property Mgmt</label>
+                        <input type="number" id="budget_propmgmt" value="6300" step="0.01" style="text-align: right;">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Annual Trash Budget</label>
+                        <input type="number" id="budget_trash" value="5397" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Annual Landscaping</label>
+                        <input type="number" id="budget_landscape" value="4662" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Annual Insurance</label>
+                        <input type="number" id="budget_insurance" value="2060" step="0.01" style="text-align: right;">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Annual Bank Fees</label>
+                        <input type="number" id="budget_bankfees" value="1119" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Annual Repairs</label>
+                        <input type="number" id="budget_repairs" value="1000" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Annual Professional Fees</label>
+                        <input type="number" id="budget_profees" value="285" step="0.01" style="text-align: right;">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Annual Electric</label>
+                        <input type="number" id="budget_electric" value="156" step="0.01" style="text-align: right;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Annual Taxes</label>
+                        <input type="number" id="budget_taxes" value="15" step="0.01" style="text-align: right;">
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="saveCurrentMonth()">Save All Changes</button>
+                    <button class="secondary" onclick="exportData()">Export as JSON</button>
+                    <button class="secondary" onclick="importData()">Import from JSON</button>
+                </div>
+            </div>
+
+            <div class="export-section">
+                <div style="font-weight: 600; margin-bottom: 8px;">Data Management</div>
+                <p style="font-size: 13px; color: #666; margin-bottom: 12px;">All data is automatically saved to your browser's local storage. You can export this data as a JSON file for backup or sharing with the board.</p>
+                <textarea id="exportTextarea" style="width: 100%; height: 150px; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 11px; display: none;"></textarea>
+            </div>
+        </div>
     </div>
-  </div>;
-}
 
-ReactDOM.render(React.createElement(Dashboard),document.getElementById('root'));
-</script>
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/prop-types@15/prop-types.min.js"></script>
+    <script src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const {BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, LineChart, Line, ComposedChart} = Recharts;
+
+        // Data initialization
+        const monthlyFlow = [
+            {month:'Mar 23',deposits:840,withdrawals:0},
+            {month:'Apr 23',deposits:336,withdrawals:346},
+            {month:'May 23',deposits:704,withdrawals:714},
+            {month:'Jun 23',deposits:1240,withdrawals:0},
+            {month:'Jul 23',deposits:536,withdrawals:165},
+            {month:'Aug 23',deposits:2868,withdrawals:329},
+            {month:'Sep 23',deposits:872,withdrawals:761},
+            {month:'Oct 23',deposits:1208,withdrawals:317},
+            {month:'Nov 23',deposits:1544,withdrawals:253},
+            {month:'Dec 23',deposits:1376,withdrawals:247},
+            {month:'Jan 24',deposits:1344,withdrawals:456},
+            {month:'Feb 24',deposits:1712,withdrawals:1440},
+            {month:'Mar 24',deposits:3224,withdrawals:1649},
+            {month:'Apr 24',deposits:2384,withdrawals:2677},
+            {month:'May 24',deposits:1680,withdrawals:1907},
+            {month:'Jun 24',deposits:4936,withdrawals:1477},
+            {month:'Jul 24',deposits:1680,withdrawals:1685},
+            {month:'Aug 24',deposits:2016,withdrawals:1931},
+            {month:'Sep 24',deposits:3056,withdrawals:2012},
+            {month:'Oct 24',deposits:3528,withdrawals:1485},
+            {month:'Nov 24',deposits:1848,withdrawals:1541},
+            {month:'Dec 24',deposits:2921,withdrawals:1949},
+            {month:'Jan 25',deposits:2016,withdrawals:605},
+            {month:'Feb 25',deposits:3864,withdrawals:2334},
+            {month:'Mar 25',deposits:1848,withdrawals:4969},
+            {month:'Apr 25',deposits:2520,withdrawals:7412},
+            {month:'May 25',deposits:4730,withdrawals:8478},
+            {month:'Jun 25',deposits:2520,withdrawals:1511},
+            {month:'Jul 25',deposits:2352,withdrawals:2130},
+            {month:'Aug 25',deposits:2856,withdrawals:4736},
+            {month:'Sep 25',deposits:3528,withdrawals:1542},
+            {month:'Oct 25',deposits:2856,withdrawals:5432},
+            {month:'Nov 25',deposits:2184,withdrawals:3135},
+            {month:'Dec 25',deposits:3696,withdrawals:2049},
+            {month:'Jan 26',deposits:2352,withdrawals:1642},
+            {month:'Feb 26',deposits:2520,withdrawals:2999},
+            {month:'Mar 26',deposits:2688,withdrawals:5134},
+            {month:'Apr 26',deposits:1512,withdrawals:1440}
+        ];
+
+        const vendorSpending = [
+            {vendor:'City of Houston (Water)',amount:27124},
+            {vendor:'LLA Property Partners',amount:16321},
+            {vendor:'Saint Clair & Sons (Landscaping)',amount:14168},
+            {vendor:'Texas Pride (Trash)',amount:12853},
+            {vendor:'Stellar Bank (Fees)',amount:1856},
+            {vendor:'Intuit/QuickBooks (Fees)',amount:1759},
+            {vendor:'US Liability Insurance',amount:1448},
+            {vendor:'Anne Beauregard (Bookkeeping)',amount:1013},
+            {vendor:'Repairs (Various)',amount:2130},
+            {vendor:'NRG/Reliant (Electric)',amount:189},
+            {vendor:'Harris County (Taxes)',amount:26}
+        ];
+
+        const incomeExpenseData = [
+            {month:'Jan 2026',income:2352,expenses:1642},
+            {month:'Feb 2026',income:2688,expenses:3005},
+            {month:'Mar 2026',income:2520,expenses:5128}
+        ];
+
+        const cashTrendData = [
+            {month:'Dec 2023',cash:8182},
+            {month:'Dec 2024',cash:18513},
+            {month:'Dec 2025',cash:9151},
+            {month:'Mar 2026',cash:6935}
+        ];
+
+        const expenseBreakdown2025 = [
+            {name:'Water',value:22931,percent:53.2},
+            {name:'Property Mgmt',value:6300,percent:14.6},
+            {name:'Trash',value:5789,percent:13.4},
+            {name:'Landscaping',value:5207,percent:12.1},
+            {name:'Bank Fees',value:1132,percent:2.6},
+            {name:'Insurance',value:824,percent:1.9},
+            {name:'Other',value:948,percent:2.2}
+        ];
+
+        const COLORS = ['#1F4E79', '#2E86AB', '#27AE60', '#FFD93D', '#FF6B6B', '#E74C3C', '#95A5A6'];
+
+        const duesBreakdownData = [
+            {name:'Water',value:93.13},
+            {name:'Property Mgmt',value:32.81},
+            {name:'Trash',value:30.44},
+            {name:'Landscaping',value:25.06},
+            {name:'Water Payoff',value:26.00},
+            {name:'Fees',value:5.81},
+            {name:'Insurance',value:4.31},
+            {name:'Repairs',value:5.19},
+            {name:'Other',value:2.44}
+        ];
+
+        const budgetData = [
+            {category:'HOA Dues',budget:8064,actual:7560},
+            {category:'Property Mgmt',budget:1575,actual:1575},
+            {category:'Water',budget:5959,actual:4193},
+            {category:'Trash',budget:1349,actual:974},
+            {category:'Landscaping',budget:1166,actual:1429},
+            {category:'Insurance',budget:515,actual:623},
+            {category:'Bank Fees',budget:280,actual:257},
+            {category:'Professional Fees',budget:71,actual:200},
+            {category:'Electric',budget:39,actual:38},
+            {category:'Repairs',budget:250,actual:0},
+            {category:'Taxes',budget:4,actual:0},
+            {category:'Violations',budget:0,actual:486}
+        ];
+
+        function ChartIncomeExpense() {
+            return React.createElement(ResponsiveContainer, {width:'100%',height:400},
+                React.createElement(BarChart, {data:incomeExpenseData},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {dataKey:'month'}),
+                    React.createElement(YAxis, null),
+                    React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
+                    React.createElement(Legend, null),
+                    React.createElement(Bar, {dataKey:'income',fill:'#27AE60',name:'Income'}),
+                    React.createElement(Bar, {dataKey:'expenses',fill:'#E74C3C',name:'Expenses'})
+                )
+            );
+        }
+
+        function ChartCashTrend() {
+            return React.createElement(ResponsiveContainer, {width:'100%',height:400},
+                React.createElement(AreaChart, {data:cashTrendData},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {dataKey:'month'}),
+                    React.createElement(YAxis, null),
+                    React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
+                    React.createElement(Area, {type:'monotone',dataKey:'cash',fill:'#1F4E79',stroke:'#2E86AB'})
+                )
+            );
+        }
+
+        function ChartExpensePie() {
+            return React.createElement(ResponsiveContainer, {width:'100%',height:400},
+                React.createElement(PieChart, null,
+                    React.createElement(Pie, {data:expenseBreakdown2025,cx:'50%',cy:'50%',labelLine:false,label: function(entry) { return entry.name + ' (' + entry.percent + '%)'; },outerRadius:120,fill:'#8884d8',dataKey:'value'},
+                        expenseBreakdown2025.map(function(entry, index) {
+                            return React.createElement(Cell, {key:'cell-' + index,fill:COLORS[index % COLORS.length]});
+                        })
+                    ),
+                    React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }})
+                )
+            );
+        }
+
+        function ChartCashFlow() {
+            return React.createElement(ResponsiveContainer, {width:'100%',height:400},
+                React.createElement(ComposedChart, {data:monthlyFlow},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {dataKey:'month',angle:-45,textAnchor:'end',height:80}),
+                    React.createElement(YAxis, null),
+                    React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
+                    React.createElement(Legend, null),
+                    React.createElement(Bar, {dataKey:'deposits',stackId:'a',fill:'#27AE60',name:'Deposits'}),
+                    React.createElement(Bar, {dataKey:'withdrawals',stackId:'b',fill:'#E74C3C',name:'Withdrawals'})
+                )
+            );
+        }
+
+        function ChartVendor() {
+            return React.createElement(ResponsiveContainer, {width:'100%',height:400},
+                React.createElement(BarChart, {data:vendorSpending,layout:'vertical',margin:{left:200}},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {type:'number'}),
+                    React.createElement(YAxis, {dataKey:'vendor',type:'category',width:190}),
+                    React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
+                    React.createElement(Bar, {dataKey:'amount',fill:'#1F4E79'})
+                )
+            );
+        }
+
+        function ChartDuesBreakdown() {
+            return React.createElement(ResponsiveContainer, {width:'100%',height:300},
+                React.createElement(BarChart, {data:duesBreakdownData,layout:'vertical',margin:{left:140}},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {type:'number'}),
+                    React.createElement(YAxis, {dataKey:'name',type:'category',width:130}),
+                    React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toFixed(2); }}),
+                    React.createElement(Bar, {dataKey:'value',fill:'#2E86AB'})
+                )
+            );
+        }
+
+        function ChartDuesPie() {
+            return React.createElement(ResponsiveContainer, {width:'100%',height:400},
+                React.createElement(PieChart, null,
+                    React.createElement(Pie, {data:duesBreakdownData,cx:'50%',cy:'50%',labelLine:false,label: function(entry) { return entry.name; },outerRadius:120,fill:'#8884d8',dataKey:'value'},
+                        duesBreakdownData.map(function(entry, index) {
+                            return React.createElement(Cell, {key:'cell-' + index,fill:COLORS[index % COLORS.length]});
+                        })
+                    ),
+                    React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toFixed(2); }})
+                )
+            );
+        }
+
+        function ChartBudget() {
+            return React.createElement(ResponsiveContainer, {width:'100%',height:400},
+                React.createElement(BarChart, {data:budgetData},
+                    React.createElement(CartesianGrid, {strokeDasharray:'3 3'}),
+                    React.createElement(XAxis, {dataKey:'category',angle:-45,textAnchor:'end',height:100}),
+                    React.createElement(YAxis, null),
+                    React.createElement(Tooltip, {formatter: function(value) { return '$' + value.toLocaleString(); }}),
+                    React.createElement(Legend, null),
+                    React.createElement(Bar, {dataKey:'budget',fill:'#95A5A6',name:'Budget'}),
+                    React.createElement(Bar, {dataKey:'actual',fill:'#1F4E79',name:'Actual'})
+                )
+            );
+        }
+
+        // Render charts
+        function renderCharts() {
+            if (document.getElementById('incomeExpenseChart')) {
+                ReactDOM.render(React.createElement(ChartIncomeExpense), document.getElementById('incomeExpenseChart'));
+            }
+            if (document.getElementById('cashTrendChart')) {
+                ReactDOM.render(React.createElement(ChartCashTrend), document.getElementById('cashTrendChart'));
+            }
+            if (document.getElementById('expensePieChart')) {
+                ReactDOM.render(React.createElement(ChartExpensePie), document.getElementById('expensePieChart'));
+            }
+            if (document.getElementById('cashFlowChart')) {
+                ReactDOM.render(React.createElement(ChartCashFlow), document.getElementById('cashFlowChart'));
+            }
+            if (document.getElementById('vendorChart')) {
+                ReactDOM.render(React.createElement(ChartVendor), document.getElementById('vendorChart'));
+            }
+            if (document.getElementById('duesBreakdownChart')) {
+                ReactDOM.render(React.createElement(ChartDuesBreakdown), document.getElementById('duesBreakdownChart'));
+            }
+            if (document.getElementById('duesPieChart')) {
+                ReactDOM.render(React.createElement(ChartDuesPie), document.getElementById('duesPieChart'));
+            }
+            if (document.getElementById('budgetChart')) {
+                ReactDOM.render(React.createElement(ChartBudget), document.getElementById('budgetChart'));
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabId) {
+            var contents = document.getElementsByClassName('tab-content');
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('active');
+            }
+            var tabs = document.getElementsByClassName('nav-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+
+            setTimeout(function() {
+                renderCharts();
+            }, 100);
+        }
+
+        // Scenario planner
+        function updateScenario() {
+            var duesAmount = parseFloat(document.getElementById('duesSlider').value);
+            document.getElementById('duesValue').textContent = duesAmount;
+
+            var useAssessment = document.getElementById('specialAssessmentToggle').checked;
+            var assessmentDiv = document.getElementById('assessmentInfo');
+            if (useAssessment) {
+                assessmentDiv.classList.remove('hidden');
+            } else {
+                assessmentDiv.classList.add('hidden');
+            }
+
+            var water = parseFloat(document.getElementById('scenarioWater').value) || 0;
+            var propMgmt = parseFloat(document.getElementById('scenarioPropMgmt').value) || 0;
+            var trash = parseFloat(document.getElementById('scenarioTrash').value) || 0;
+            var landscape = parseFloat(document.getElementById('scenarioLandscape').value) || 0;
+            var fees = parseFloat(document.getElementById('scenarioFees').value) || 0;
+            var other = parseFloat(document.getElementById('scenarioOther').value) || 0;
+
+            var monthlyExpenses = water + propMgmt + trash + landscape + fees + other;
+            var monthlyIncome = duesAmount * 16;
+
+            var annualIncome = monthlyIncome * 12;
+            var annualExpenses = monthlyExpenses * 12;
+            var annualNet = annualIncome - annualExpenses;
+
+            document.getElementById('scenarioIncome').textContent = '$' + annualIncome.toLocaleString('en-US', {maximumFractionDigits: 0});
+            document.getElementById('scenarioExpenses').textContent = '$' + annualExpenses.toLocaleString('en-US', {maximumFractionDigits: 0});
+
+            var netElement = document.getElementById('scenarioNet');
+            netElement.textContent = (annualNet < 0 ? '-' : '') + '$' + Math.abs(annualNet).toLocaleString('en-US', {maximumFractionDigits: 0});
+            netElement.style.color = (annualNet < 0 ? '#E74C3C' : '#27AE60');
+        }
+
+        function setDuesAmount(amount) {
+            document.getElementById('duesSlider').value = amount;
+            var buttons = document.querySelectorAll('.quick-btn');
+            buttons.forEach(function(btn) { btn.classList.remove('active'); });
+            event.target.classList.add('active');
+            updateScenario();
+        }
+
+        // Water plan
+        function updateWaterPlan() {
+            var balance = parseFloat(document.getElementById('waterBalance').value) || 0;
+            var months = parseFloat(document.getElementById('waterMonths').value) || 18;
+
+            var monthlyPayment = balance / months;
+            var perHousehold = monthlyPayment / 16;
+
+            document.getElementById('waterMonthlyPayment').textContent = '$' + monthlyPayment.toFixed(2);
+            document.getElementById('waterPerHousehold').textContent = '$' + perHousehold.toFixed(2);
+
+            var now = new Date();
+            var payoffDate = new Date(now.getFullYear(), now.getMonth() + months, 1);
+            document.getElementById('waterPayoffDate').textContent = payoffDate.toLocaleDateString('en-US', {year:'numeric',month:'short'});
+
+            // Generate schedule
+            var tbody = document.getElementById('waterScheduleBody');
+            tbody.innerHTML = '';
+            var remainingBalance = balance;
+            for (var i = 1; i <= Math.min(months, 36); i++) {
+                var month = new Date(now.getFullYear(), now.getMonth() + i, 1);
+                remainingBalance = Math.max(0, remainingBalance - monthlyPayment);
+                var row = document.createElement('tr');
+                row.innerHTML = '<td>' + month.toLocaleDateString('en-US', {year:'numeric',month:'short'}) + '</td><td>$' + monthlyPayment.toFixed(2) + '</td><td>$' + remainingBalance.toFixed(2) + '</td>';
+                tbody.appendChild(row);
+            }
+            if (months > 36) {
+                var row = document.createElement('tr');
+                row.innerHTML = '<td colspan="3" style="text-align:center; font-style:italic;">... (' + (months - 36) + ' more months)</td>';
+                tbody.appendChild(row);
+            }
+        }
+
+        function setWaterMonths(months) {
+            document.getElementById('waterMonths').value = months;
+            var buttons = document.querySelectorAll('.quick-btn');
+            buttons.forEach(function(btn) { btn.classList.remove('active'); });
+            event.target.classList.add('active');
+            updateWaterPlan();
+        }
+
+        // Data entry
+        var monthlyData = {};
+
+        function initializeMonthlyData() {
+            var stored = localStorage.getItem('HOA_MonthlyData');
+            if (stored) {
+                monthlyData = JSON.parse(stored);
+            } else {
+                monthlyData = {
+                    '2026-01': {
+                        dues: 2352, water: 0, propmgmt: 525, trash: 0, landscape: 400.53,
+                        insurance: 623.30, bankfees: 80.35, repairs: 0, profees: 0,
+                        electric: 12.70, taxes: 0, violations: 0,
+                        cash: 8858.63, ar: 1344, reserve: -1500,
+                        arAging: {A: {current: 168, days30: 168, days60: 168, days90: 168, days90plus: 0},
+                                   B: {current: 168, days30: 168, days60: 168, days90: 0, days90plus: 0},
+                                   C: {current: 168, days30: 0, days60: 0, days90: 0, days90plus: 0}}
+                    },
+                    '2026-02': {
+                        dues: 2688, water: 1488.69, propmgmt: 525, trash: 486.87, landscape: 400.53,
+                        insurance: 0, bankfees: 91.27, repairs: 0, profees: 0,
+                        electric: 12.57, taxes: 0, violations: 0,
+                        cash: 7956.14, ar: 1344, reserve: -2100,
+                        arAging: {A: {current: 168, days30: 168, days60: 168, days90: 168, days90plus: 0},
+                                   B: {current: 168, days30: 168, days60: 168, days90: 0, days90plus: 0},
+                                   C: {current: 168, days30: 0, days60: 0, days90: 0, days90plus: 0}}
+                    },
+                    '2026-03': {
+                        dues: 2520, water: 2704.41, propmgmt: 525, trash: 486.87, landscape: 627.86,
+                        insurance: 0, bankfees: 85.81, repairs: 0, profees: 200,
+                        electric: 12.54, taxes: 0, violations: 486,
+                        cash: 6935.28, ar: 1344, reserve: -3200,
+                        arAging: {A: {current: 168, days30: 168, days60: 168, days90: 168, days90plus: 0},
+                                   B: {current: 168, days30: 168, days60: 168, days90: 0, days90plus: 0},
+                                   C: {current: 168, days30: 0, days60: 0, days90: 0, days90plus: 0}}
+                    }
+                };
+                localStorage.setItem('HOA_MonthlyData', JSON.stringify(monthlyData));
+            }
+        }
+
+        function loadMonthData() {
+            var month = document.getElementById('dataMonth').value;
+            var data = monthlyData[month];
+            if (data) {
+                document.getElementById('field_dues').value = data.dues;
+                document.getElementById('field_water').value = data.water;
+                document.getElementById('field_propmgmt').value = data.propmgmt;
+                document.getElementById('field_trash').value = data.trash;
+                document.getElementById('field_landscape').value = data.landscape;
+                document.getElementById('field_insurance').value = data.insurance;
+                document.getElementById('field_bankfees').value = data.bankfees;
+                document.getElementById('field_repairs').value = data.repairs;
+                document.getElementById('field_profees').value = data.profees;
+                document.getElementById('field_electric').value = data.electric;
+                document.getElementById('field_taxes').value = data.taxes;
+                document.getElementById('field_violations').value = data.violations;
+                document.getElementById('field_cash').value = data.cash;
+                document.getElementById('field_ar').value = data.ar;
+                document.getElementById('field_reserve').value = data.reserve;
+                renderARTable(data.arAging);
+            }
+        }
+
+        function renderARTable(arAging) {
+            var tbody = document.getElementById('arTable');
+            tbody.innerHTML = '';
+            var owners = ['A', 'B', 'C'];
+            owners.forEach(function(owner) {
+                var aging = arAging[owner];
+                var total = aging.current + aging.days30 + aging.days60 + aging.days90 + aging.days90plus;
+                var row = document.createElement('tr');
+                row.innerHTML = '<td><strong>Owner ' + owner + '</strong></td>' +
+                    '<td><input type="number" value="' + aging.current + '" step="0.01" style="width:80px;"></td>' +
+                    '<td><input type="number" value="' + aging.days30 + '" step="0.01" style="width:80px;"></td>' +
+                    '<td><input type="number" value="' + aging.days60 + '" step="0.01" style="width:80px;"></td>' +
+                    '<td><input type="number" value="' + aging.days90 + '" step="0.01" style="width:80px;"></td>' +
+                    '<td><input type="number" value="' + aging.days90plus + '" step="0.01" style="width:80px;"></td>' +
+                    '<td style="text-align:right;"><strong>$' + total.toFixed(2) + '</strong></td>';
+                tbody.appendChild(row);
+            });
+        }
+
+        function saveCurrentMonth() {
+            var month = document.getElementById('dataMonth').value;
+            var arAging = {};
+            var rows = document.getElementById('arTable').rows;
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].cells;
+                var owner = cells[0].textContent.replace('Owner ', '').trim();
+                arAging[owner] = {
+                    current: parseFloat(cells[1].querySelector('input').value),
+                    days30: parseFloat(cells[2].querySelector('input').value),
+                    days60: parseFloat(cells[3].querySelector('input').value),
+                    days90: parseFloat(cells[4].querySelector('input').value),
+                    days90plus: parseFloat(cells[5].querySelector('input').value)
+                };
+            }
+
+            monthlyData[month] = {
+                dues: parseFloat(document.getElementById('field_dues').value),
+                water: parseFloat(document.getElementById('field_water').value),
+                propmgmt: parseFloat(document.getElementById('field_propmgmt').value),
+                trash: parseFloat(document.getElementById('field_trash').value),
+                landscape: parseFloat(document.getElementById('field_landscape').value),
+                insurance: parseFloat(document.getElementById('field_insurance').value),
+                bankfees: parseFloat(document.getElementById('field_bankfees').value),
+                repairs: parseFloat(document.getElementById('field_repairs').value),
+                profees: parseFloat(document.getElementById('field_profees').value),
+                electric: parseFloat(document.getElementById('field_electric').value),
+                taxes: parseFloat(document.getElementById('field_taxes').value),
+                violations: parseFloat(document.getElementById('field_violations').value),
+                cash: parseFloat(document.getElementById('field_cash').value),
+                ar: parseFloat(document.getElementById('field_ar').value),
+                reserve: parseFloat(document.getElementById('field_reserve').value),
+                arAging: arAging
+            };
+
+            localStorage.setItem('HOA_MonthlyData', JSON.stringify(monthlyData));
+            alert('Month data saved successfully!');
+        }
+
+        function addNewMonth() {
+            var month = prompt('Enter month in format YYYY-MM (e.g., 2026-04):');
+            if (month && month.match(/^\d{4}-\d{2}$/)) {
+                monthlyData[month] = {
+                    dues: 0, water: 0, propmgmt: 0, trash: 0, landscape: 0,
+                    insurance: 0, bankfees: 0, repairs: 0, profees: 0,
+                    electric: 0, taxes: 0, violations: 0,
+                    cash: 0, ar: 0, reserve: 0,
+                    arAging: {A: {current: 0, days30: 0, days60: 0, days90: 0, days90plus: 0},
+                               B: {current: 0, days30: 0, days60: 0, days90: 0, days90plus: 0},
+                               C: {current: 0, days30: 0, days60: 0, days90: 0, days90plus: 0}}
+                };
+                localStorage.setItem('HOA_MonthlyData', JSON.stringify(monthlyData));
+                document.getElementById('dataMonth').value = month;
+                loadMonthData();
+            }
+        }
+
+        function addAROwner() {
+            var nextOwner = String.fromCharCode(65 + Object.keys(monthlyData[document.getElementById('dataMonth').value].arAging).length);
+            var month = document.getElementById('dataMonth').value;
+            monthlyData[month].arAging[nextOwner] = {current: 0, days30: 0, days60: 0, days90: 0, days90plus: 0};
+            renderARTable(monthlyData[month].arAging);
+        }
+
+        function exportData() {
+            var exportText = JSON.stringify(monthlyData, null, 2);
+            document.getElementById('exportTextarea').style.display = 'block';
+            document.getElementById('exportTextarea').value = exportText;
+            var link = document.createElement('a');
+            link.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(exportText);
+            link.download = 'HOA_Financial_Data.json';
+            link.click();
+        }
+
+        function importData() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        monthlyData = JSON.parse(event.target.result);
+                        localStorage.setItem('HOA_MonthlyData', JSON.stringify(monthlyData));
+                        alert('Data imported successfully!');
+                        loadMonthData();
+                    } catch(err) {
+                        alert('Error importing file: ' + err.message);
+                    }
+                };
+                reader.readAsText(e.target.files[0]);
+            };
+            input.click();
+        }
+
+        // Transactions
+        var transactionsData = [
+            {date:'2026-04-01',desc:'Dues Deposit',cat:'Income',vendor:'Online Banking',amt:1512,type:'Deposit'},
+            {date:'2026-03-31',desc:'Water Bill',cat:'Utilities',vendor:'City of Houston',amt:2704.41,type:'Withdrawal'},
+            {date:'2026-03-28',desc:'Landscaping Service',cat:'Maintenance',vendor:'Saint Clair & Sons',amt:627.86,type:'Withdrawal'},
+            {date:'2026-03-28',desc:'Trash Collection',cat:'Utilities',vendor:'Texas Pride',amt:486.87,type:'Withdrawal'},
+            {date:'2026-03-27',desc:'Violation Fine',cat:'Other',vendor:'Code Enforcement',amt:486,type:'Withdrawal'},
+            {date:'2026-03-25',desc:'Professional Services',cat:'Admin',vendor:'Accounting Firm',amt:200,type:'Withdrawal'},
+            {date:'2026-03-20',desc:'Property Management',cat:'Management',vendor:'LLA Property Partners',amt:525,type:'Withdrawal'},
+            {date:'2026-03-15',desc:'Bank Fees',cat:'Fees',vendor:'Stellar Bank',amt:85.81,type:'Withdrawal'},
+            {date:'2026-03-10',desc:'ACH Processing Fee',cat:'Fees',vendor:'Intuit QuickBooks',amt:10.41,type:'Withdrawal'},
+            {date:'2026-03-05',desc:'Dues Deposit',cat:'Income',vendor:'Online Banking',amt:840,type:'Deposit'},
+            {date:'2026-02-28',desc:'Water Bill',cat:'Utilities',vendor:'City of Houston',amt:1488.69,type:'Withdrawal'},
+            {date:'2026-02-28',desc:'Dues Deposit',cat:'Income',vendor:'Online Banking',amt:1848,type:'Deposit'}
+        ];
+
+        function renderTransactions() {
+            var tbody = document.getElementById('transactionBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            transactionsData.forEach(function(tx) {
+                var row = document.createElement('tr');
+                var amtClass = tx.type === 'Deposit' ? 'transaction-deposit' : 'transaction-withdrawal';
+                var amtSign = tx.type === 'Deposit' ? '+' : '-';
+                row.innerHTML = '<td>' + tx.date + '</td><td>' + tx.desc.substring(0, 30) + '</td><td>' + tx.cat + '</td><td>' + tx.vendor.substring(0, 25) + '</td><td class="' + amtClass + '">' + amtSign + '$' + tx.amt.toFixed(2) + '</td><td>' + tx.type + '</td>';
+                tbody.appendChild(row);
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMonthlyData();
+            loadMonthData();
+            renderTransactions();
+            updateScenario();
+            updateWaterPlan();
+            renderCharts();
+        });
+    </script>
 </body>
 </html>

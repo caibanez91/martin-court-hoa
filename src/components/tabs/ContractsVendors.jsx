@@ -2,8 +2,8 @@ import KpiCard from '../KpiCard';
 import ChartCard from '../ChartCard';
 import CalloutBox from '../CalloutBox';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { COLORS } from '../../data/constants';
-import { NORMALIZED_MONTHLY } from '../../data/normalizedExpenses';
+import { COLORS, fmt, fmtShort } from '../../data/constants';
+import { NORMALIZED_MONTHLY, TOTAL_MONTHLY } from '../../data/normalizedExpenses';
 
 export default function ContractsVendors() {
   const vendorData = [
@@ -52,15 +52,26 @@ export default function ContractsVendors() {
       notes: 'Common area maintenance. Seasonal spikes in spring/summer.'
     },
     {
+      vendor: 'USLI (via Acrisure)',
+      service: 'HOA Insurance (Property, Liability, D&O)',
+      monthlyRate: 171.75,
+      annualRate: 2061.00,
+      contractType: 'Insurance',
+      status: 'Active',
+      renewalDate: 'Annual renewal',
+      percentage: 5.7,
+      notes: 'Annual premium: Commercial Property $524 + General Liability $500 + D&O $1,037. Carrier: USLI via Acrisure/Quickinsured.'
+    },
+    {
       vendor: 'Various',
-      service: 'Insurance, Utilities, Professional Fees, Other',
-      monthlyRate: 210.08,
-      annualRate: 2520.97,
+      service: 'Electricity, Professional Fees, Gate Maintenance, Bank Fees, Property Tax',
+      monthlyRate: 158.05,
+      annualRate: 1896.55,
       contractType: 'Mixed',
       status: 'Active',
       renewalDate: 'Various',
-      percentage: 8.5,
-      notes: 'Includes annual insurance premiums, electricity, professional consulting, bank fees.'
+      percentage: 5.3,
+      notes: 'Includes: Electricity (94.31), Professional Fees/Anne Beauregard (28.09), Gate Maintenance (20.83), Bank Fees (12.64), Property Tax (2.18).'
     }
   ];
 
@@ -79,15 +90,15 @@ export default function ContractsVendors() {
       <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '40px' }}>
         <KpiCard
           label="Total Monthly Vendor Spend"
-          value={`$${totalMonthlyVendors.toFixed(2)}`}
-          sublabel="All contracts"
+          value={fmt(totalMonthlyVendors)}
+          sublabel="All contracts and ongoing expenses"
           status="neutral"
         />
       </div>
 
       {/* Spending Distribution */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-        <ChartCard title="Monthly Spending by Major Vendor" height={300}>
+        <ChartCard title="Monthly Spending by Major Vendor" height={300} subtitle="Top 4 vendor spend distribution">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -95,7 +106,7 @@ export default function ContractsVendors() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, value }) => `${name.split(' ')[0]}: $${value}`}
+                label={({ name, value }) => `${name.split(' ')[0]}: ${fmt(value)}`}
                 outerRadius={100}
                 dataKey="value"
               >
@@ -103,18 +114,18 @@ export default function ContractsVendors() {
                   <Cell key={`cell-${index}`} fill={[COLORS.accent, COLORS.positive, COLORS.warning, COLORS.negative][index % 4]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => `$${value.toFixed(0)}`} />
+              <Tooltip formatter={(value) => fmt(value)} />
             </PieChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Spending by Vendor (Bar)" height={300}>
+        <ChartCard title="Spending by Vendor (Bar)" height={300} subtitle="Monthly spend comparison">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={spendingData} layout="vertical" margin={{ top: 5, right: 30, left: 150, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
-              <XAxis type="number" />
+              <XAxis type="number" tickFormatter={(v) => fmtShort(v)} />
               <YAxis dataKey="name" type="category" width={140} />
-              <Tooltip formatter={(value) => `$${value.toFixed(0)}`} />
+              <Tooltip formatter={(value) => fmt(value)} />
               <Bar dataKey="value" fill={COLORS.accent} />
             </BarChart>
           </ResponsiveContainer>
@@ -156,13 +167,13 @@ export default function ContractsVendors() {
                 <div>
                   <p style={{ color: COLORS.muted, fontSize: '11px', margin: '0 0 4px 0', textTransform: 'uppercase' }}>Monthly Rate</p>
                   <p style={{ color: COLORS.navy, fontSize: '16px', fontWeight: '700', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
-                    ${vendor.monthlyRate.toFixed(2)}
+                    {fmt(vendor.monthlyRate)}
                   </p>
                 </div>
                 <div>
                   <p style={{ color: COLORS.muted, fontSize: '11px', margin: '0 0 4px 0', textTransform: 'uppercase' }}>Annual Rate</p>
                   <p style={{ color: COLORS.navy, fontSize: '16px', fontWeight: '700', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
-                    ${vendor.annualRate.toFixed(2)}
+                    {fmt(vendor.annualRate)}
                   </p>
                 </div>
                 <div>
@@ -190,7 +201,8 @@ export default function ContractsVendors() {
 
       {/* Benchmarking & Recommendations */}
       <div style={{ marginBottom: '40px' }}>
-        <h3 style={{ color: COLORS.navy, marginBottom: '16px' }}>Benchmarking & Recommendations</h3>
+        <h3 style={{ color: COLORS.navy, marginBottom: '8px' }}>Benchmarking & Recommendations</h3>
+        <p style={{ color: COLORS.muted, fontSize: '14px', marginBottom: '16px' }}>Market analysis and cost optimization opportunities</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
           <CalloutBox type="info" title="Property Management Fee">
             <p><strong>$525/month ($6,300/year)</strong> is within market rate for a 16-unit HOA but warrants annual review. Consider: Does LLA provide adequate value? Are invoices itemized?</p>
@@ -219,15 +231,17 @@ export default function ContractsVendors() {
       </div>
 
       {/* Opportunities for Savings */}
-      <CalloutBox type="success" title="Potential Cost Reduction Opportunities">
-        <ul style={{ margin: '8px 0 0 0', paddingLeft: '16px', lineHeight: '1.7', color: COLORS.muted }}>
-          <li><strong>Trash Service Rebid (Q2 2026):</strong> Potential 5-10% savings by competitive bidding = ~$250-500/year</li>
-          <li><strong>Landscaping Optimization:</strong> Negotiate seasonal rates or defer non-essential work = ~$1,000-2,000/year</li>
-          <li><strong>Property Management Review:</strong> Confirm itemized invoicing and efficiency; potential 10% reduction = ~$600/year</li>
-          <li><strong>Water Conservation:</strong> Install smart meters or educate residents = ~$100-200/month potential savings</li>
-          <li><strong>Bulk Assessment:</strong> Total potential savings: $2,000-3,500/year (7-12% budget reduction)</li>
-        </ul>
-      </CalloutBox>
+      <div style={{ marginBottom: '40px' }}>
+        <CalloutBox type="success" title="Potential Cost Reduction Opportunities">
+          <ul style={{ margin: '8px 0 0 0', paddingLeft: '16px', lineHeight: '1.7', color: COLORS.muted }}>
+            <li><strong>Trash Service Rebid (Q2 2026):</strong> Potential 5-10% savings by competitive bidding = ~$250-500/year</li>
+            <li><strong>Landscaping Optimization:</strong> Negotiate seasonal rates or defer non-essential work = ~$1,000-2,000/year</li>
+            <li><strong>Property Management Review:</strong> Confirm itemized invoicing and efficiency; potential 10% reduction = ~$600/year</li>
+            <li><strong>Water Conservation:</strong> Install smart meters or educate residents = ~$100-200/month potential savings</li>
+            <li><strong>Bulk Assessment:</strong> Total potential savings: $2,000-3,500/year (7-12% budget reduction)</li>
+          </ul>
+        </CalloutBox>
+      </div>
 
       <div style={{
         marginTop: '40px',

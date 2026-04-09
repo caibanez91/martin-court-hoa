@@ -1,24 +1,25 @@
-import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import KpiCard from '../KpiCard';
 import ChartCard from '../ChartCard';
 import DataTable from '../DataTable';
-import { COLORS } from '../../data/constants';
+import CalloutBox from '../CalloutBox';
+import { COLORS, WATER_BALANCE, CASH_AVAILABLE, fmt, fmtShort } from '../../data/constants';
 import { PL_DATA } from '../../data/plData';
 
 export default function PLSinceInception() {
   // Calculate cumulative data
   const allMonths = [];
-  const monthExpenseBreakdown = {};
 
   Object.keys(PL_DATA).forEach(year => {
     const data = PL_DATA[year];
     data.months.forEach((month, idx) => {
       const fullMonth = `${month} ${year}`;
+      const monthExpenses = Object.values(data.expenses).reduce((sum, arr) => sum + arr[idx], 0);
       allMonths.push({
         month: fullMonth,
         income: data.income[idx],
-        expenses: Object.values(data.expenses).reduce((sum, arr) => sum + arr[idx], 0),
-        net: data.income[idx] - Object.values(data.expenses).reduce((sum, arr) => sum + arr[idx], 0)
+        expenses: monthExpenses,
+        net: data.income[idx] - monthExpenses
       });
     });
   });
@@ -28,17 +29,6 @@ export default function PLSinceInception() {
   const totalExpenses = Object.values(PL_DATA).reduce((sum, data) => sum + data.total_expenses, 0);
   const totalNet = totalIncome - totalExpenses;
 
-  const incomeByYear = Object.keys(PL_DATA).map(year => ({
-    year,
-    income: PL_DATA[year].total_income,
-    expenses: PL_DATA[year].total_expenses,
-    net: PL_DATA[year].total_income - PL_DATA[year].total_expenses
-  }));
-
-  // Best and worst months
-  const bestMonth = allMonths.reduce((best, curr) => curr.net > best.net ? curr : best);
-  const worstMonth = allMonths.reduce((worst, curr) => curr.net < worst.net ? curr : worst);
-
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
       <h2 style={{ color: COLORS.navy, marginBottom: '20px' }}>P&L Since Inception</h2>
@@ -47,68 +37,30 @@ export default function PLSinceInception() {
       <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '40px' }}>
         <KpiCard
           label="Total Income (2023-2026)"
-          value={`$${totalIncome.toFixed(2)}`}
-          sublabel="All periods"
+          value={fmt(totalIncome)}
+          sublabel="All periods combined"
           status="positive"
         />
         <KpiCard
           label="Total Expenses (2023-2026)"
-          value={`$${totalExpenses.toFixed(2)}`}
-          sublabel="All periods"
+          value={fmt(totalExpenses)}
+          sublabel="All periods combined"
           status="negative"
         />
         <KpiCard
           label="Cumulative Net"
-          value={`$${totalNet.toFixed(2)}`}
+          value={fmt(totalNet)}
           sublabel={totalNet >= 0 ? 'Surplus' : 'Deficit'}
           status={totalNet >= 0 ? 'positive' : 'negative'}
         />
-        <KpiCard
-          label="Best Month"
-          value={bestMonth.month.split(' ').slice(0, 2).join(' ')}
-          sublabel={`Net: $${bestMonth.net.toFixed(2)}`}
-          status="positive"
-        />
-        <KpiCard
-          label="Worst Month"
-          value={worstMonth.month.split(' ').slice(0, 2).join(' ')}
-          sublabel={`Net: $${worstMonth.net.toFixed(2)}`}
-          status="negative"
-        />
-        <KpiCard
-          label="Avg Monthly Income"
-          value={`$${(totalIncome / allMonths.length).toFixed(0)}`}
-          sublabel={`${allMonths.length} months`}
-          status="neutral"
-        />
       </div>
 
-      {/* Year-over-Year Comparison */}
-      <ChartCard title="Year-over-Year P&L Comparison" height={300}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={incomeByYear}>
-            <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
-            <XAxis dataKey="year" />
-            <YAxis />
-            <Tooltip formatter={(value) => `$${value.toFixed(0)}`} />
-            <Legend />
-            <Bar dataKey="income" fill={COLORS.positive} />
-            <Bar dataKey="expenses" fill={COLORS.negative} />
-            <Bar
-              dataKey="net"
-              fill="transparent"
-              shape={<CustomBar />}
-            >
-              {incomeByYear.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.net >= 0 ? COLORS.positive : COLORS.negative} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartCard>
-
       {/* Net Income Trend */}
-      <ChartCard title="Net Income Trend (All Months)" height={300}>
+      <ChartCard
+        title="Net Income Trend (All Months)"
+        subtitle="Monthly net income over the entire period"
+        height={300}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={allMonths}>
             <defs>
@@ -119,50 +71,17 @@ export default function PLSinceInception() {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
             <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={(value) => `$${value.toFixed(0)}`} />
+            <YAxis tickFormatter={(v) => fmtShort(v)} />
+            <Tooltip formatter={(value) => fmtShort(value)} />
             <Area type="monotone" dataKey="net" stroke={COLORS.accent} fillOpacity={1} fill="url(#colorNet)" />
           </AreaChart>
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* Monthly Heatmap */}
-      <ChartCard title="Monthly Net Income Heatmap" height={250}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(12, 1fr)',
-          gap: '4px',
-          padding: '20px'
-        }}>
-          {allMonths.map((month, idx) => (
-            <div
-              key={idx}
-              style={{
-                background: month.net >= 0 ? COLORS.positive : COLORS.negative,
-                opacity: Math.min(1, Math.abs(month.net) / 5000),
-                borderRadius: '4px',
-                padding: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '60px',
-                cursor: 'pointer',
-                color: 'white',
-                fontSize: '11px',
-                fontWeight: '600'
-              }}
-              title={`${month.month}: $${month.net.toFixed(0)}`}
-            >
-              <div>${Math.abs(month.net).toFixed(0)}</div>
-            </div>
-          ))}
-        </div>
-      </ChartCard>
-
       {/* Full Detail Table */}
       <div style={{ marginTop: '40px' }}>
-        <h3 style={{ color: COLORS.navy, marginBottom: '16px' }}>Detailed Monthly P&L</h3>
+        <h3 style={{ color: COLORS.navy, marginBottom: '8px' }}>Detailed Monthly P&L</h3>
+        <p style={{ color: COLORS.muted, marginBottom: '16px', fontSize: '14px' }}>Complete breakdown of income and expenses by month</p>
         <DataTable
           columns={[
             { key: 'month', label: 'Month', type: 'text' },
@@ -174,6 +93,15 @@ export default function PLSinceInception() {
           searchable={true}
         />
       </div>
+
+      {/* Important Notes */}
+      <CalloutBox type="danger" title="Cash Position After Water Debt">
+        <p>The current cash on hand ({fmt(CASH_AVAILABLE)}) has <strong>not</strong> accounted for the {fmt(WATER_BALANCE)} owed to the City of Houston. If we were to pay this debt from available cash, the HOA would be at {fmt(CASH_AVAILABLE - WATER_BALANCE)} — effectively negative.</p>
+      </CalloutBox>
+
+      <CalloutBox type="info" title="P&L vs. Bank Statement Differences">
+        <p>The P&L totals shown here may differ from the Bank Transactions tab because: (1) the P&L uses accrual-based accounting, recording income when assessed and expenses when incurred, while the bank statement records cash movements when they actually clear; (2) some bank deposits (e.g., refunds, transfers) may not classify as "income" on the P&L; and (3) period boundaries cause timing differences between when a transaction is recorded on each report.</p>
+      </CalloutBox>
 
       {/* Analysis */}
       <div style={{
@@ -205,9 +133,4 @@ export default function PLSinceInception() {
       </div>
     </div>
   );
-}
-
-function CustomBar(props) {
-  const { fill, x, y, width, height, data } = props;
-  return <rect x={x} y={y} width={width} height={height} fill={fill} />;
 }

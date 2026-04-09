@@ -1,0 +1,182 @@
+MARTIN COURT HOA FINANCIAL DASHBOARD - BUILD COMPLETE
+=====================================================
+
+PROJECT STRUCTURE:
+./
+├── .github/
+│   └── workflows/
+│       └── deploy.yml (GitHub Actions CI/CD pipeline)
+├── src/
+│   ├── App.jsx (Main app component with tab routing)
+│   ├── App.css (Global styling)
+│   ├── main.jsx (React entry point)
+│   ├── components/
+│   │   ├── Header.jsx (Header with HOA name)
+│   │   ├── TabNavigation.jsx (Tab switcher with icons)
+│   │   ├── KpiCard.jsx (Reusable KPI card component)
+│   │   ├── ChartCard.jsx (Recharts wrapper component)
+│   │   ├── DataTable.jsx (Sortable/paginated data table)
+│   │   ├── StatusBadge.jsx (Colored status indicators)
+│   │   ├── CalloutBox.jsx (Info/warning callout boxes)
+│   │   └── tabs/
+│   │       ├── ExecutiveSummary.jsx (Health score, KPIs, critical issues)
+│   │       ├── FinancialHealth.jsx (Income/expense analysis, collections)
+│   │       ├── WhereDuesGo.jsx (Expense breakdown, interactive slider)
+│   │       ├── PLSinceInception.jsx (Full P&L history 2023-2026)
+│   │       ├── BankTransactions.jsx (576 transaction records, vendor analysis)
+│   │       ├── Q1Budget.jsx (Budget vs actual comparison)
+│   │       ├── WaterTimeline.jsx (Crisis timeline, root cause analysis)
+│   │       ├── ProposedSolutions.jsx (5 solution scenarios, what-if modeling)
+│   │       └── ContractsVendors.jsx (Vendor details, cost benchmarking)
+│   └── data/
+│       ├── constants.js (HOA facts, color palette)
+│       ├── plData.js (2023-2026 P&L monthly data)
+│       ├── transactions.js (576 bank transactions Mar 2023 - Apr 2026)
+│       ├── waterBills.js (Water bill history & timeline events)
+│       └── normalizedExpenses.js (Normalized monthly costs by category)
+├── public/ (Static assets directory)
+├── .gitignore (Node modules and build artifacts excluded)
+├── index_new.html (React app HTML entry point)
+├── vite.config.js (Vite configuration with /martin-court-hoa/ base path)
+├── package.json (Dependencies: React, Recharts, React Icons, Vite)
+├── Finance/ (Preserved: Existing PDFs and spreadsheets)
+├── Admin Procedures & Forms/ (Preserved: Existing documents)
+├── Martin_Court_HOA_Meeting_Prep.docx (Preserved: Existing doc)
+└── index.html (Preserved: Original HTML file with transaction data)
+
+FEATURES IMPLEMENTED:
+
+1. EXECUTIVE SUMMARY TAB
+   - Financial health score gauge (50-100 based on net income)
+   - 6 KPI cards (Dues, 2025 Net, Shortfall, Unpaid, Cash, Water Debt)
+   - YoY trend chart (2023-2025 income vs expenses)
+   - 3 critical issue callout boxes
+
+2. FINANCIAL HEALTH TAB
+   - 5 KPI cards (Income, Expenses, Net, Avg, Actual Costs)
+   - Q1 2026 income vs expenses grouped bars
+   - 2025 monthly trend line chart
+   - YoY net income bar chart (color-coded)
+   - Cash balance projection (Apr-Jun 2026)
+   - Expense breakdown pie chart
+   - Dues collection status table
+
+3. WHERE DUES GO TAB
+   - 5 KPI cards (Current dues, Actual costs, Per-household, Shortfall, Highest expense)
+   - Interactive dues slider ($150-$300)
+   - 3 impact cards showing monthly income/shortfall/annual impact
+   - Expense breakdown pie and horizontal bar charts
+   - Per-household cost breakdown table (all 10 categories)
+   - 3 key findings callout boxes
+
+4. P&L SINCE INCEPTION TAB
+   - 7 KPI cards (Total income, expenses, net, best/worst months)
+   - YoY comparison grouped bar chart
+   - Net income trend area chart
+   - Monthly heatmap visualization (all months color-coded)
+   - Detailed monthly P&L table (searchable, sortable)
+   - Key findings analysis paragraph
+
+5. BANK TRANSACTIONS TAB
+   - 5 KPI cards (Total deposits, withdrawals, net flow, fees, count)
+   - Top 5 vendor spending cards
+   - Monthly cash flow bar chart (last 12 months)
+   - Top vendors horizontal bar chart
+   - Fee analysis callout box
+   - Searchable/sortable transaction table (paginated 50 per page)
+   - 576 total transactions included
+
+6. Q1 BUDGET TAB
+   - 4 KPI cards (Budget, Actual, Variance, Avg Monthly)
+   - Budget vs actual grouped bars (Jan-Mar 2026)
+   - Variance analysis by category with status badges
+   - Variance notes and explanations
+   - Budget/actual comparison table
+
+7. WATER TIMELINE TAB
+   - 7 KPI cards (Balance, Per-household, Bills, Total billed, Consumption, Avg)
+   - Timeline events with dates and details (Oct 2024 - Jan 2026)
+   - Water bill amounts bar chart
+   - Water consumption line chart
+   - Detailed bill history table
+   - Root cause analysis (FEIN issue, NOT a leak)
+   - "What This Means for You" plain-language section
+
+8. PROPOSED SOLUTIONS TAB
+   - Interactive dues slider ($150-$300) with preset buttons
+   - 3 impact cards (Monthly income, Shortfall, Water payoff months)
+   - Budget vs assessment comparison bar chart
+   - 5 detailed solution cards:
+     * Lump Sum + Break-Even ($181/month + $468 assessment)
+     * Keep $168 + Renegotiate
+     * Phased Increase ($200 then $225)
+     * Fully Funded Model ($225 + $234 assessment)
+   - Pros/cons and timeline for each solution
+   - Recommendation callout box
+
+9. CONTRACTS & VENDORS TAB
+   - 1 KPI card (Total monthly vendor spend)
+   - Spending distribution pie and bar charts
+   - 5 vendor detail cards with:
+     * Service description
+     * Monthly/annual rates
+     * Contract renewal dates
+     * % of budget
+     * Status notes
+   - Benchmarking and recommendations section
+   - Cost reduction opportunities callout
+
+DESIGN FEATURES:
+
+✓ Navy/blue color scheme (#0F2B46 primary)
+✓ Accent colors: Green (#0D9488), Red (#DC2626), Orange (#D97706)
+✓ All monetary values formatted with $ and commas
+✓ Tab-based navigation with 9 distinct sections
+✓ Responsive grid layouts (auto-fit, minmax)
+✓ Recharts integration (BarChart, LineChart, PieChart, AreaChart)
+✓ Charts include value labels and custom tooltips
+✓ Table pagination (50 rows per page)
+✓ Interactive elements (sliders, preset buttons)
+✓ Status badges for quick status visualization
+✓ Callout boxes for key findings and warnings
+✓ Tabular-nums font variant for aligned numbers
+✓ Google Fonts (Inter) for clean typography
+✓ No print buttons (per requirements)
+✓ All data formatted properly (currency, dates, etc.)
+
+GITHUB PAGES DEPLOYMENT:
+
+The GitHub Actions workflow (.github/workflows/deploy.yml) will:
+1. Trigger on push to main branch
+2. Check out code
+3. Install dependencies (npm ci)
+4. Build the app (npm run build)
+5. Upload dist/ to GitHub Pages
+6. Deploy to: https://github.com/[user]/martin-court-hoa/pages
+   Access at: https://[user].github.io/martin-court-hoa/
+
+BASE PATH CONFIGURED: /martin-court-hoa/ (for GitHub Pages subpath)
+
+DATA INTEGRITY:
+
+All 576 bank transactions included
+All P&L data 2023-2026
+Water bill history with 8 records
+Normalized expense analysis
+Special assessments calculated
+Water debt payoff timelines computed
+Collection status tracked
+
+NEXT STEPS FOR USER:
+
+1. Ensure index_new.html is renamed to index.html OR update vite.config build settings
+2. Run: npm install && npm run build (locally if testing)
+3. Verify dist/ folder is created
+4. Push to GitHub main branch
+5. GitHub Actions will automatically deploy
+6. Access dashboard at: https://[username].github.io/martin-court-hoa/
+
+NOTE: index_new.html should replace the old index.html, or update references as needed.
+
+BUILD DATE: April 8, 2026
+DASHBOARD VERSION: 1.0

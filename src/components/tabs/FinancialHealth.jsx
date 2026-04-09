@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, ReferenceLine } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import KpiCard from '../KpiCard';
 import ChartCard from '../ChartCard';
 import CalloutBox from '../CalloutBox';
 import StatusBadge from '../StatusBadge';
-import { COLORS, MONTHLY_DUES, TOTAL_HOUSEHOLDS } from '../../data/constants';
+import { COLORS, TOTAL_HOUSEHOLDS, DELINQUENT_ACCOUNTS, fmt, fmtShort } from '../../data/constants';
 import { PL_DATA } from '../../data/plData';
 import { NORMALIZED_MONTHLY, TOTAL_MONTHLY, PER_HOUSEHOLD_MONTHLY } from '../../data/normalizedExpenses';
 
@@ -29,25 +29,15 @@ export default function FinancialHealth() {
     { year: '2025', income: 33768, expenses: 43130.84, net: -9362.84 }
   ];
 
-  const cashProjection = [
-    { month: 'Jan', balance: 6410 },
-    { month: 'Feb', balance: 6598 },
-    { month: 'Mar', balance: 2353 },
-    { month: 'Apr', balance: 4845 },
-    { month: 'May', balance: 4500 },
-    { month: 'Jun', balance: 3200 }
-  ];
-
-  const expenseCategories = NORMALIZED_MONTHLY.map(item => ({
-    name: item.category.split(' (')[0],
-    value: item.monthly
+  const expenseChartData = NORMALIZED_MONTHLY.map(item => ({
+    category: item.category.split(' (')[0],
+    monthly: item.monthly
   }));
 
   const duesCollectionData = [
-    { household: 'Household A', amount: 336, status: 'Paid', date: '2026-04-01' },
-    { household: 'Household B', amount: 168, status: 'Delinquent', date: 'Unknown' },
-    { household: 'Household C', amount: 504, status: 'Delinquent', date: 'Unknown' },
-    { household: 'Household D', amount: 318, status: 'Delinquent', date: 'Unknown' }
+    { household: 'Household 1', current: 162, days1_30: 168, days31_60: 168, days61_90: 168, total: 666 },
+    { household: 'Household 2', current: 162, days1_30: 168, days31_60: 168, days61_90: 0, total: 498 },
+    { household: 'Household 3', current: 162, days1_30: 0, days31_60: 0, days61_90: 0, total: 162 }
   ];
 
   return (
@@ -58,44 +48,42 @@ export default function FinancialHealth() {
       <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '40px' }}>
         <KpiCard
           label="2025 Total Income"
-          value="$33,768"
-          sublabel="12 months"
+          value={fmt(33768)}
+          sublabel=""
           status="positive"
         />
         <KpiCard
           label="2025 Total Expenses"
-          value="$43,131"
-          sublabel="12 months"
+          value={fmt(43130.84)}
+          sublabel=""
           status="negative"
         />
         <KpiCard
           label="2025 Net Result"
-          value="-$9,363"
+          value={fmt(-9362.84)}
           sublabel="Deficit"
           status="negative"
         />
         <KpiCard
-          label="Avg Monthly Income"
-          value={`$${(33768 / 12).toFixed(0)}`}
-          sublabel="2025 average"
-          status="neutral"
-        />
-        <KpiCard
           label="Actual Monthly Costs"
-          value={`$${TOTAL_MONTHLY.toFixed(2)}`}
-          sublabel={`Per household: $${PER_HOUSEHOLD_MONTHLY.toFixed(2)}`}
+          value={fmt(TOTAL_MONTHLY)}
+          sublabel={`${fmt(PER_HOUSEHOLD_MONTHLY)} per household`}
           status="warning"
         />
       </div>
 
       {/* Q1 2026 Income vs Expenses */}
-      <ChartCard title="Q1 2026: Income vs Expenses" height={300}>
+      <ChartCard
+        title="Q1 2026: Income vs Expenses"
+        subtitle="Monthly comparison of revenue collected and expenses incurred"
+        height={300}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={q12026Data}>
             <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
             <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+            <YAxis tickFormatter={(v) => fmtShort(v)} />
+            <Tooltip formatter={(value) => fmt(value)} />
             <Legend />
             <Bar dataKey="income" fill={COLORS.positive} />
             <Bar dataKey="expenses" fill={COLORS.negative} />
@@ -104,13 +92,17 @@ export default function FinancialHealth() {
       </ChartCard>
 
       {/* 2025 Monthly Trend */}
-      <ChartCard title="2025 Monthly Income & Expenses" height={300}>
+      <ChartCard
+        title="2025 Monthly Income & Expenses"
+        subtitle="Trend analysis showing the seasonal pattern and persistent expense-to-income gap"
+        height={300}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={monthlyData2025}>
             <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
             <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={(value) => `$${value.toFixed(0)}`} />
+            <YAxis tickFormatter={(v) => fmtShort(v)} />
+            <Tooltip formatter={(value) => fmtShort(value)} />
             <Legend />
             <Line type="monotone" dataKey="income" stroke={COLORS.positive} strokeWidth={2} name="Income" />
             <Line type="monotone" dataKey="expenses" stroke={COLORS.negative} strokeWidth={2} name="Expenses" />
@@ -118,14 +110,18 @@ export default function FinancialHealth() {
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* Year-over-Year */}
-      <ChartCard title="Year-over-Year Net Income" height={300}>
+      {/* Year-over-Year Net Income */}
+      <ChartCard
+        title="Year-over-Year Net Income"
+        subtitle="Annual net income shows the HOA's financial trajectory"
+        height={300}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={yearData}>
             <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
             <XAxis dataKey="year" />
-            <YAxis />
-            <Tooltip formatter={(value) => `$${value.toFixed(0)}`} />
+            <YAxis tickFormatter={(v) => fmtShort(v)} />
+            <Tooltip formatter={(value) => fmtShort(value)} />
             <Bar dataKey="net">
               {yearData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.net >= 0 ? COLORS.positive : COLORS.negative} />
@@ -135,72 +131,99 @@ export default function FinancialHealth() {
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* Cash Balance Projection */}
-      <ChartCard title="Cash Balance Projection (April - June 2026)" height={300}>
+      {/* Monthly Expenses by Category */}
+      <ChartCard
+        title="Monthly Expenses by Category"
+        subtitle="Normalized monthly cost by category based on 2025 actuals and verified contract rates"
+        height={400}
+      >
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={cashProjection}>
+          <BarChart
+            data={expenseChartData}
+            layout="vertical"
+            margin={{ top: 5, right: 30, left: 200, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={(value) => `$${value.toFixed(0)}`} />
-            <Line type="monotone" dataKey="balance" stroke={COLORS.navy} strokeWidth={2} />
-            <ReferenceLine y={0} stroke={COLORS.negative} strokeWidth={2} strokeDasharray="5 5" />
-          </LineChart>
+            <XAxis type="number" tickFormatter={(v) => fmtShort(v)} />
+            <YAxis dataKey="category" type="category" width={195} tick={{ fontSize: 12 }} />
+            <Tooltip formatter={(value) => fmt(value)} />
+            <Bar dataKey="monthly" fill={COLORS.accent} radius={[0, 8, 8, 0]} />
+          </BarChart>
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* Expense Breakdown by Category */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginTop: '20px' }}>
-        <ChartCard title="Monthly Expenses by Category" height={300}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={expenseCategories}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, value }) => `${name}: $${value}`}
-                outerRadius={100}
-                dataKey="value"
-              >
-                {expenseCategories.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={[COLORS.accent, COLORS.positive, COLORS.warning, COLORS.negative][index % 4]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => `$${value.toFixed(0)}`} />
-            </PieChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <div>
-          <h4 style={{ color: COLORS.navy, marginBottom: '16px' }}>Expense Summary</h4>
-          <div style={{
-            background: COLORS.cardBg,
-            border: `1px solid ${COLORS.border}`,
-            borderRadius: '12px',
-            padding: '16px'
+      {/* Expense Summary */}
+      <div style={{ marginTop: '40px' }}>
+        <div style={{ marginBottom: '12px' }}>
+          <h3 style={{ color: COLORS.navy, margin: '0 0 4px 0' }}>Expense Summary</h3>
+          <p style={{ color: COLORS.muted, fontSize: '13px', margin: 0 }}>All 11 normalized monthly categories</p>
+        </div>
+        <div style={{
+          background: COLORS.cardBg,
+          border: `1px solid ${COLORS.border}`,
+          borderRadius: '12px',
+          padding: '0',
+          overflow: 'hidden'
+        }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            fontSize: '13px'
           }}>
-            {NORMALIZED_MONTHLY.slice(0, 5).map((item, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '12px 0',
-                borderBottom: idx < 4 ? `1px solid ${COLORS.border}` : 'none',
-                fontSize: '13px'
+            <tbody>
+              {NORMALIZED_MONTHLY.map((item, idx) => (
+                <tr key={idx} style={{
+                  borderBottom: idx < NORMALIZED_MONTHLY.length - 1 ? `1px solid ${COLORS.border}` : 'none',
+                  background: idx % 2 === 0 ? COLORS.cardBg : COLORS.background
+                }}>
+                  <td style={{
+                    padding: '12px 16px',
+                    color: COLORS.navy,
+                    fontWeight: '500'
+                  }}>
+                    {item.category}
+                  </td>
+                  <td style={{
+                    padding: '12px 16px',
+                    textAlign: 'right',
+                    color: COLORS.navy,
+                    fontVariantNumeric: 'tabular-nums',
+                    fontWeight: '600'
+                  }}>
+                    {fmt(item.monthly)}
+                  </td>
+                </tr>
+              ))}
+              <tr style={{
+                background: COLORS.navy,
+                fontWeight: '700'
               }}>
-                <span style={{ color: COLORS.muted }}>{item.category}</span>
-                <span style={{ fontWeight: '600', color: COLORS.navy, fontVariantNumeric: 'tabular-nums' }}>
-                  ${item.monthly.toFixed(2)}
-                </span>
-              </div>
-            ))}
-          </div>
+                <td style={{
+                  padding: '12px 16px',
+                  color: 'white'
+                }}>
+                  Total Monthly
+                </td>
+                <td style={{
+                  padding: '12px 16px',
+                  textAlign: 'right',
+                  color: 'white',
+                  fontVariantNumeric: 'tabular-nums'
+                }}>
+                  {fmt(TOTAL_MONTHLY)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Dues Collection Table */}
+      {/* Dues Collection Status Table */}
       <div style={{ marginTop: '40px' }}>
-        <h3 style={{ color: COLORS.navy, marginBottom: '16px' }}>Dues Collection Status</h3>
+        <div style={{ marginBottom: '12px' }}>
+          <h3 style={{ color: COLORS.navy, margin: '0 0 4px 0' }}>Dues Collection Status</h3>
+          <p style={{ color: COLORS.muted, fontSize: '13px', margin: 0 }}>Based on AR Aging Report as of March 31, 2026</p>
+        </div>
         <div style={{
           background: COLORS.cardBg,
           border: `1px solid ${COLORS.border}`,
@@ -214,10 +237,12 @@ export default function FinancialHealth() {
           }}>
             <thead>
               <tr style={{ background: COLORS.tableHeader, borderBottom: `1px solid ${COLORS.border}` }}>
-                <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: COLORS.navy }}>Household</th>
-                <th style={{ padding: '12px', textAlign: 'right', fontWeight: '600', color: COLORS.navy }}>Amount Owed</th>
-                <th style={{ padding: '12px', textAlign: 'center', fontWeight: '600', color: COLORS.navy }}>Status</th>
-                <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: COLORS.navy }}>Last Payment</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: '600', color: COLORS.navy }}>Household</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontWeight: '600', color: COLORS.navy }}>Current</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontWeight: '600', color: COLORS.navy }}>1-30 Days</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontWeight: '600', color: COLORS.navy }}>31-60 Days</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontWeight: '600', color: COLORS.navy }}>61-90 Days</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontWeight: '600', color: COLORS.navy }}>Total</th>
               </tr>
             </thead>
             <tbody>
@@ -226,17 +251,24 @@ export default function FinancialHealth() {
                   background: idx % 2 === 0 ? COLORS.cardBg : COLORS.background,
                   borderBottom: `1px solid ${COLORS.border}`
                 }}>
-                  <td style={{ padding: '12px', color: COLORS.navy }}>{row.household}</td>
-                  <td style={{ padding: '12px', textAlign: 'right', color: COLORS.navy, fontVariantNumeric: 'tabular-nums' }}>
-                    ${row.amount.toFixed(2)}
+                  <td style={{ padding: '12px 16px', color: COLORS.navy, fontWeight: '500' }}>
+                    {row.household}
                   </td>
-                  <td style={{ padding: '12px', textAlign: 'center' }}>
-                    <StatusBadge
-                      status={row.status === 'Paid' ? 'success' : 'danger'}
-                      label={row.status}
-                    />
+                  <td style={{ padding: '12px 16px', textAlign: 'right', color: COLORS.navy, fontVariantNumeric: 'tabular-nums' }}>
+                    {fmt(row.current)}
                   </td>
-                  <td style={{ padding: '12px', color: COLORS.muted }}>{row.date}</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'right', color: COLORS.navy, fontVariantNumeric: 'tabular-nums' }}>
+                    {fmt(row.days1_30)}
+                  </td>
+                  <td style={{ padding: '12px 16px', textAlign: 'right', color: COLORS.navy, fontVariantNumeric: 'tabular-nums' }}>
+                    {fmt(row.days31_60)}
+                  </td>
+                  <td style={{ padding: '12px 16px', textAlign: 'right', color: row.days61_90 > 0 ? COLORS.negative : COLORS.navy, fontVariantNumeric: 'tabular-nums' }}>
+                    {fmt(row.days61_90)}
+                  </td>
+                  <td style={{ padding: '12px 16px', textAlign: 'right', color: COLORS.navy, fontVariantNumeric: 'tabular-nums', fontWeight: '600' }}>
+                    {fmt(row.total)}
+                  </td>
                 </tr>
               ))}
             </tbody>

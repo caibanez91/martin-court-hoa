@@ -2,81 +2,96 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import KpiCard from '../KpiCard';
 import ChartCard from '../ChartCard';
 import StatusBadge from '../StatusBadge';
-import { COLORS } from '../../data/constants';
+import { COLORS, fmt, fmtShort } from '../../data/constants';
 
 export default function Q1Budget() {
+  // Q1 2026 Corrected Monthly Data
+  // Budget = normalized monthly ($3,003.20), Actual = from verified P&L
   const q1Data = [
-    { month: 'January', budget: 2400, actual: 1819.98, variance: 580.02 },
-    { month: 'February', budget: 2400, actual: 2504.20, variance: -104.20 },
-    { month: 'March', budget: 2400, actual: 6765.30, variance: -4365.30 }
+    { month: 'January', budget: 3003.20, actual: 1641.88, variance: 1361.32 },
+    { month: 'February', budget: 3003.20, actual: 3004.93, variance: -1.73 },
+    { month: 'March', budget: 3003.20, actual: 5128.49, variance: -2125.29 }
   ];
 
+  // Q1 Budget by Category (from verified P&L)
   const categoryData = [
-    { category: 'Water', budget: 400, actual: 414.10, status: 'warning', variance: -14.10 },
-    { category: 'Property Mgmt (LLA)', budget: 525, actual: 525, status: 'success', variance: 0 },
-    { category: 'Trash (Texas Pride)', budget: 480, actual: 486.87, status: 'warning', variance: -6.87 },
-    { category: 'Landscaping (St. Clair)', budget: 400, actual: 476.30, status: 'danger', variance: -76.30 },
-    { category: 'Insurance', budget: 200, actual: 623.30, status: 'danger', variance: -423.30 },
-    { category: 'Bank & Processing Fees', budget: 90, actual: 89.13, status: 'success', variance: 0.87 },
-    { category: 'Professional Fees', budget: 100, actual: 200, status: 'danger', variance: -100 },
-    { category: 'Repairs & Maintenance', budget: 200, actual: 0, status: 'success', variance: 200 },
-    { category: 'Electricity', budget: 15, actual: 12.27, status: 'success', variance: 2.73 }
+    { category: 'Water', budget: 3600.00, actual: 4193.10, variance: -593.10, status: 'danger' },
+    { category: 'Property Mgmt (LLA)', budget: 1575.00, actual: 1575.00, variance: 0, status: 'success' },
+    { category: 'Trash (Texas Pride)*', budget: 1447.23, actual: 973.74, variance: 473.49, status: 'warning', note: 'Jan payment made in Dec 2025' },
+    { category: 'Landscaping (St. Clair)', budget: 1301.73, actual: 1428.92, variance: -127.19, status: 'warning' },
+    { category: 'Insurance', budget: 515.25, actual: 623.30, variance: -108.05, status: 'warning' },
+    { category: 'Bank & Processing Fees', budget: 282.93, actual: 257.43, variance: 25.50, status: 'success' },
+    { category: 'Professional Fees', budget: 84.27, actual: 200.00, variance: -115.73, status: 'danger' },
+    { category: 'Repairs & Maintenance', budget: 96.24, actual: 0, variance: 96.24, status: 'success' },
+    { category: 'Gate Maintenance', budget: 62.49, actual: 0, variance: 62.49, status: 'success' },
+    { category: 'Electricity', budget: 37.92, actual: 37.81, variance: 0.11, status: 'success' },
+    { category: 'Property Tax', budget: 6.54, actual: 0, variance: 6.54, status: 'success' },
+    { category: 'Violations', budget: 0, actual: 486.00, variance: -486.00, status: 'danger' }
   ];
 
   const totalBudget = q1Data.reduce((sum, m) => sum + m.budget, 0);
   const totalActual = q1Data.reduce((sum, m) => sum + m.actual, 0);
   const totalVariance = totalBudget - totalActual;
 
+  const getStatusLabel = (status) => {
+    return status === 'success' ? 'On Track' : status === 'warning' ? 'Minor Variance' : 'Over Budget';
+  };
+
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-      <h2 style={{ color: COLORS.navy, marginBottom: '20px' }}>Q1 2026 Budget vs Actual</h2>
+      <h2 style={{ color: COLORS.navy, marginBottom: '8px' }}>Q1 2026 Budget vs Actual</h2>
+      <p style={{ margin: '0 0 20px 0', color: COLORS.muted, fontSize: '14px' }}>Verified P&L Report | January - March 2026</p>
 
       {/* KPI Grid */}
       <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '40px' }}>
         <KpiCard
           label="Q1 Total Budget"
-          value={`$${totalBudget.toFixed(2)}`}
-          sublabel="3 months"
+          value={fmt(totalBudget)}
+          sublabel="3 months (normalized monthly basis)"
           status="neutral"
         />
         <KpiCard
           label="Q1 Actual Spending"
-          value={`$${totalActual.toFixed(2)}`}
-          sublabel="3 months"
+          value={fmt(totalActual)}
+          sublabel="3 months (verified actuals)"
           status={totalVariance >= 0 ? 'positive' : 'negative'}
         />
         <KpiCard
           label="Budget Variance"
-          value={`$${Math.abs(totalVariance).toFixed(2)}`}
+          value={fmt(Math.abs(totalVariance))}
           sublabel={totalVariance >= 0 ? 'Under budget' : 'Over budget'}
           status={totalVariance >= 0 ? 'positive' : 'negative'}
         />
         <KpiCard
-          label="Avg Monthly Budget"
-          value={`$${(totalBudget / 3).toFixed(2)}`}
-          sublabel="Per month target"
-          status="neutral"
+          label="Variance %"
+          value={`${((totalVariance / totalBudget) * 100).toFixed(1)}%`}
+          sublabel={totalVariance >= 0 ? 'Favorable' : 'Unfavorable'}
+          status={totalVariance >= 0 ? 'positive' : 'negative'}
         />
       </div>
 
       {/* Budget vs Actual Chart */}
-      <ChartCard title="Monthly Budget vs Actual Spending" height={300}>
+      <ChartCard title="Monthly Budget vs Actual Spending" subtitle="Q1 2026 Comparison">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={q1Data}>
+          <BarChart data={q1Data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
             <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+            <YAxis tickFormatter={(v) => fmtShort(v)} />
+            <Tooltip
+              formatter={(value) => fmt(value)}
+              contentStyle={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}
+            />
             <Legend />
-            <Bar dataKey="budget" fill={COLORS.accent} name="Budget" />
-            <Bar dataKey="actual" fill={COLORS.negative} name="Actual" />
+            <Bar dataKey="budget" fill={COLORS.accent} name="Budget (Normalized)" />
+            <Bar dataKey="actual" fill={COLORS.negative} name="Actual (P&L)" />
           </BarChart>
         </ResponsiveContainer>
       </ChartCard>
 
       {/* Category Breakdown Table */}
       <div style={{ marginTop: '40px' }}>
-        <h3 style={{ color: COLORS.navy, marginBottom: '16px' }}>Q1 Budget by Category</h3>
+        <h3 style={{ color: COLORS.navy, marginBottom: '8px' }}>Q1 Budget by Category</h3>
+        <p style={{ margin: '0 0 16px 0', color: COLORS.muted, fontSize: '14px' }}>Budget represents 3x normalized monthly allocation; Actual from verified P&L report</p>
         <div style={{
           background: COLORS.cardBg,
           border: `1px solid ${COLORS.border}`,
@@ -105,10 +120,10 @@ export default function Q1Budget() {
                 }}>
                   <td style={{ padding: '12px', color: COLORS.navy }}>{row.category}</td>
                   <td style={{ padding: '12px', textAlign: 'right', color: COLORS.navy, fontVariantNumeric: 'tabular-nums' }}>
-                    ${row.budget.toFixed(2)}
+                    {fmt(row.budget)}
                   </td>
                   <td style={{ padding: '12px', textAlign: 'right', color: COLORS.navy, fontVariantNumeric: 'tabular-nums' }}>
-                    ${row.actual.toFixed(2)}
+                    {fmt(row.actual)}
                   </td>
                   <td style={{
                     padding: '12px',
@@ -117,10 +132,10 @@ export default function Q1Budget() {
                     fontVariantNumeric: 'tabular-nums',
                     fontWeight: '600'
                   }}>
-                    {row.variance >= 0 ? '+' : ''} ${row.variance.toFixed(2)}
+                    {row.variance >= 0 ? '+' : ''} {fmt(row.variance)}
                   </td>
                   <td style={{ padding: '12px', textAlign: 'center' }}>
-                    <StatusBadge status={row.status} label={row.status === 'success' ? 'On Track' : row.status === 'warning' ? 'Minor Variance' : 'Over Budget'} />
+                    <StatusBadge status={row.status} label={getStatusLabel(row.status)} />
                   </td>
                 </tr>
               ))}
@@ -131,7 +146,7 @@ export default function Q1Budget() {
 
       {/* Variance Analysis */}
       <div style={{ marginTop: '40px' }}>
-        <h3 style={{ color: COLORS.navy, marginBottom: '16px' }}>Variance Analysis & Notes</h3>
+        <h3 style={{ color: COLORS.navy, marginBottom: '16px' }}>Variance Analysis & Key Insights</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
           <div style={{
             background: COLORS.cardBg,
@@ -139,11 +154,12 @@ export default function Q1Budget() {
             borderRadius: '12px',
             padding: '16px'
           }}>
-            <h4 style={{ color: COLORS.negative, fontSize: '14px', margin: '0 0 8px 0' }}>Major Overages</h4>
+            <h4 style={{ color: COLORS.negative, fontSize: '14px', margin: '0 0 8px 0' }}>Major Overages (Over Budget)</h4>
             <ul style={{ margin: 0, paddingLeft: '16px', color: COLORS.muted, fontSize: '13px', lineHeight: '1.6' }}>
-              <li><strong>Insurance (Jan):</strong> $623.30 annual premium paid in January; budget spread across months</li>
-              <li><strong>Professional Fees (Mar):</strong> $200 additional legal/consulting work beyond budget</li>
-              <li><strong>Landscaping (Mar):</strong> $627.86 vs $400 budgeted; seasonal spring work</li>
+              <li><strong>Violations:</strong> {fmt(486)} unexpected HOA violation charges in March</li>
+              <li><strong>Water:</strong> {fmt(593.10)} overage; seasonal demand and usage increase</li>
+              <li><strong>Professional Fees:</strong> {fmt(115.73)} additional legal/consulting beyond budget</li>
+              <li><strong>Landscaping:</strong> {fmt(127.19)} overage; spring maintenance work exceeded allocation</li>
             </ul>
           </div>
           <div style={{
@@ -152,11 +168,12 @@ export default function Q1Budget() {
             borderRadius: '12px',
             padding: '16px'
           }}>
-            <h4 style={{ color: COLORS.positive, fontSize: '14px', margin: '0 0 8px 0' }}>Good News</h4>
+            <h4 style={{ color: COLORS.positive, fontSize: '14px', margin: '0 0 8px 0' }}>Budget Favorable Items (Under Budget)</h4>
             <ul style={{ margin: 0, paddingLeft: '16px', color: COLORS.muted, fontSize: '13px', lineHeight: '1.6' }}>
-              <li><strong>Processing Fees:</strong> Minimal fees; only $89.13 vs $90 budgeted</li>
-              <li><strong>Electricity:</strong> $12.27 actual vs $15 budgeted</li>
-              <li><strong>Repairs & Maintenance:</strong> No emergency repairs needed YTD</li>
+              <li><strong>Trash Service*:</strong> {fmt(473.49)} apparent savings, but January payment was made in December 2025 — variance is a timing artifact, not actual savings</li>
+              <li><strong>Bank Fees:</strong> {fmt(25.50)} favorable; minimal processing charges</li>
+              <li><strong>Repairs & Maintenance:</strong> {fmt(96.24)} unused; no emergency repairs needed YTD</li>
+              <li><strong>Gate Maintenance:</strong> {fmt(62.49)} unused; no gate repairs required</li>
             </ul>
           </div>
           <div style={{
@@ -165,11 +182,12 @@ export default function Q1Budget() {
             borderRadius: '12px',
             padding: '16px'
           }}>
-            <h4 style={{ color: COLORS.warning, fontSize: '14px', margin: '0 0 8px 0' }}>Key Observations</h4>
+            <h4 style={{ color: COLORS.warning, fontSize: '14px', margin: '0 0 8px 0' }}>Summary & Recommendations</h4>
             <ul style={{ margin: 0, paddingLeft: '16px', color: COLORS.muted, fontSize: '13px', lineHeight: '1.6' }}>
-              <li><strong>March Spike:</strong> Water and landscaping expenses drove Q1 over budget</li>
-              <li><strong>Seasonal Pattern:</strong> Spring landscaping and water usage increase typical</li>
-              <li><strong>Budget Revision Recommended:</strong> Consider adjusting annual budget based on actual Q1</li>
+              <li><strong>Overall Status:</strong> Q1 actual spending {fmt(totalActual)} vs normalized budget {fmt(totalBudget)}</li>
+              <li><strong>March Spike:</strong> Water and landscaping drove seasonal variance; expect similar patterns in spring</li>
+              <li><strong>Violation Impact:</strong> {fmt(486)} unexpected violation charge requires investigation</li>
+              <li><strong>Recommendation:</strong> Adjust annual water & landscaping budgets based on Q1 actuals</li>
             </ul>
           </div>
         </div>
@@ -183,7 +201,7 @@ export default function Q1Budget() {
         fontSize: '13px',
         color: COLORS.muted
       }}>
-        <p style={{ margin: 0 }}>Last Updated: April 8, 2026 | Data Source: Bank statements, Monthly reconciliation</p>
+        <p style={{ margin: 0 }}>Last Updated: April 8, 2026 | Data Source: Verified P&L Report | Q1 2026 Actual Expenses</p>
       </div>
     </div>
   );
